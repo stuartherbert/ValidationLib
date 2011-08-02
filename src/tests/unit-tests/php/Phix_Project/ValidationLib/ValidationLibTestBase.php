@@ -34,7 +34,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Phix
+ * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
  * @copyright   2011 Stuart Herbert. www.stuartherbert.com
@@ -44,57 +44,20 @@
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix\ValidationLib;
+namespace Phix_Project\ValidationLib;
 
-class MustBeValidPathTest extends ValidationLibTestBase
+class ValidationLibTestBase extends \PHPUnit_Framework_TestCase
 {
-        /**
-         *
-         * @return MustBeValidPath
-         */
-        protected function setupObj()
+        protected function doTestIsValid(Validator $validator, $value)
         {
-                // setup the test
-                $obj = new MustBeValidPath();
-                $messages = $obj->getMessages();
-                $this->assertTrue(is_array($messages));
-                $this->assertEquals(0, count($messages));
-
-                return $obj;
+                $this->assertTrue($validator->isValid($value));
+                $this->assertEquals(0, count($validator->getMessages()));
         }
 
-        public function testCorrectlyDetectsADirectory()
+        protected function doTestIsNotValid(Validator $validator, $value, $errorMessages)
         {
-                $obj = $this->setupObj();
-                $this->doTestIsValid($obj, __DIR__);
-        }
-
-        public function testCorrectlyDetectsAFile()
-        {
-                $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, __FILE__, array("'" . __FILE__ . "' is a file; expected a directory"));
-        }
-
-        public function testCorrectlyDetectsAMissingDirectory()
-        {
-                $obj = $this->setupObj();
-                $dir = __DIR__ . '.bogus';
-                $this->doTestIsNotValid($obj, $dir, array("'$dir' does not exist on disk at all"));
-        }
-
-        public function testCorrectlyDetectsADevice()
-        {
-                $obj = $this->setupObj();
-
-                // this only works on unix-like operating systems
-                if (file_exists('/dev/null'))
-                {
-                        $this->doTestIsNotValid($obj, '/dev/null', array("'/dev/null' exists, but is not a directory"));
-                }
-                else
-                {
-                        // we fake this test for now
-                        $this->assertTrue(true);
-                }
+                $this->assertFalse($validator->isValid($value));
+                $this->assertNotEquals(0, count($validator->getMessages()));
+                $this->assertEquals($errorMessages, $validator->getMessages());
         }
 }

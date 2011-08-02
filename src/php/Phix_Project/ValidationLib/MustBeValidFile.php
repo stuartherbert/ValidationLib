@@ -34,7 +34,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Phix
+ * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
  * @copyright   2011 Stuart Herbert. www.stuartherbert.com
@@ -44,41 +44,29 @@
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix\ValidationLib;
+namespace Phix_Project\ValidationLib;
 
-class MustBeValidFileTest extends ValidationLibTestBase
+class MustBeValidFile extends ValidatorAbstract
 {
-        /**
-         *
-         * @return MustBeValidFile
-         */
-        protected function setupObj()
-        {
-                // setup the test
-                $obj = new MustBeValidFile();
-                $messages = $obj->getMessages();
-                $this->assertTrue(is_array($messages));
-                $this->assertEquals(0, count($messages));
+        const MSG_NOTVALIDFILE = 'msgNotValidFile';
 
-                return $obj;
-        }
-
-        public function testCorrectlyDetectsAFile()
-        {
-                $obj = $this->setupObj();
-                $this->doTestIsValid($obj, __FILE__);
-        }
-
-        public function testCorrectlyDetectsAMissingFile()
-        {
-                $obj = $this->setupObj();
-                $file = __FILE__ . '.bogus';
-                $this->doTestIsNotValid($obj, $file, array("'$file' is not a valid file"));
-        }
+        protected $_messageTemplates = array
+        (
+                self::MSG_NOTVALIDFILE => "'%value%' is not a valid file",
+        );
         
-        public function testCorrectlyDetectsADirectory()
+        public function isValid($value)
         {
-                $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, __DIR__, array("'" . __DIR__ . "' is not a valid file"));
+                $this->_setValue($value);
+
+                $isValid = true;
+
+                if (!is_file($value))
+                {
+                        $this->_error(self::MSG_NOTVALIDFILE);
+                        $isValid = false;
+                }
+
+                return $isValid;
         }
 }

@@ -34,7 +34,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Phix
+ * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
  * @copyright   2011 Stuart Herbert. www.stuartherbert.com
@@ -44,20 +44,35 @@
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix\ValidationLib;
+namespace Phix_Project\ValidationLib;
 
-class ValidationLibTestBase extends \PHPUnit_Framework_TestCase
+class MustBeInteger extends ValidatorAbstract
 {
-        protected function doTestIsValid(Validator $validator, $value)
-        {
-                $this->assertTrue($validator->isValid($value));
-                $this->assertEquals(0, count($validator->getMessages()));
-        }
+        const MSG_NOTVALIDINTEGER = 'msgValidInteger';
 
-        protected function doTestIsNotValid(Validator $validator, $value, $errorMessages)
+        protected $_messageTemplates = array
+        (
+                self::MSG_NOTVALIDINTEGER => "'%value%' (of type %type%) is not a valid integer",
+        );
+        
+        public function isValid($value)
         {
-                $this->assertFalse($validator->isValid($value));
-                $this->assertNotEquals(0, count($validator->getMessages()));
-                $this->assertEquals($errorMessages, $validator->getMessages());
+                $this->_setValue($value);
+
+                if (!is_int($value) && !is_string($value))
+                {
+                        $this->_error(self::MSG_NOTVALIDINTEGER);
+                        return false;
+                }
+
+                // does the (probably string) get through the filter too?
+                if ($value != \filter_var($value, \FILTER_SANITIZE_NUMBER_INT))
+                {
+                        $this->_error(self::MSG_NOTVALIDINTEGER);
+                        return false;
+                }
+
+                // if we get here, then we like the value
+                return true;
         }
 }

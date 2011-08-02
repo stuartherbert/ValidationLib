@@ -34,7 +34,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Phix
+ * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
  * @copyright   2011 Stuart Herbert. www.stuartherbert.com
@@ -44,15 +44,15 @@
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix\ValidationLib;
+namespace Phix_Project\ValidationLib;
 
-class MustBeValidFile extends ValidatorAbstract
+class MustBeString extends ValidatorAbstract
 {
-        const MSG_NOTVALIDFILE = 'msgNotValidFile';
+        const MSG_NOTVALIDSTRING = 'msgNotValidString';
 
         protected $_messageTemplates = array
         (
-                self::MSG_NOTVALIDFILE => "'%value%' is not a valid file",
+                self::MSG_NOTVALIDSTRING => "'%value%' (of type %type%) is not a valid string",
         );
         
         public function isValid($value)
@@ -61,12 +61,13 @@ class MustBeValidFile extends ValidatorAbstract
 
                 $isValid = true;
 
-                if (!is_file($value))
+                // these are the only types that convert to being a string
+                if (!is_int($value) && !is_float($value) && !is_string($value))
                 {
-                        $this->_error(self::MSG_NOTVALIDFILE);
-                        $isValid = false;
+                        $this->_error(self::MSG_NOTVALIDSTRING);
+                        return false;
                 }
 
-                return $isValid;
+                return true;
         }
 }

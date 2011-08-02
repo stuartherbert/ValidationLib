@@ -34,7 +34,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Phix
+ * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
  * @copyright   2011 Stuart Herbert. www.stuartherbert.com
@@ -44,30 +44,49 @@
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix\ValidationLib;
+namespace Phix_Project\ValidationLib;
 
-class MustBeString extends ValidatorAbstract
+class MustBeValidPath extends ValidatorAbstract
 {
-        const MSG_NOTVALIDSTRING = 'msgNotValidString';
+        const MSG_PATHNOTFOUND  = 'msgPathNotFound';
+        const MSG_PATHISAFILE   = 'msgPathIsAFile';
+        const MSG_PATHISNOTADIR = 'msgPathIsNotADir';
 
         protected $_messageTemplates = array
         (
-                self::MSG_NOTVALIDSTRING => "'%value%' (of type %type%) is not a valid string",
+                self::MSG_PATHNOTFOUND => "'%value%' does not exist on disk at all",
+                self::MSG_PATHISAFILE   => "'%value%' is a file; expected a directory",
+                self::MSG_PATHISNOTADIR => "'%value%' exists, but is not a directory",
         );
-        
+
         public function isValid($value)
         {
                 $this->_setValue($value);
 
-                $isValid = true;
+                $isValid = false;
 
-                // these are the only types that convert to being a string
-                if (!is_int($value) && !is_float($value) && !is_string($value))
+                if (is_dir($value))
                 {
-                        $this->_error(self::MSG_NOTVALIDSTRING);
+                        return true;
+                }
+                
+                if (!\file_exists($value))
+                {
+                        $this->_error(self::MSG_PATHNOTFOUND);
                         return false;
                 }
 
-                return true;
+                // it exists, but what is it?
+                if (is_file($value))
+                {
+                        $this->_error(self::MSG_PATHISAFILE);
+                }
+                else
+                {
+                        // we do not know what it is
+                        $this->_error(self::MSG_PATHISNOTADIR);
+                }
+
+                return false;
         }
 }

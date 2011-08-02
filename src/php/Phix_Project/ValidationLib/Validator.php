@@ -34,7 +34,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Phix
+ * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
  * @copyright   2011 Stuart Herbert. www.stuartherbert.com
@@ -44,49 +44,24 @@
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix\ValidationLib;
+namespace Phix_Project\ValidationLib;
 
-class MustBeValidPath extends ValidatorAbstract
+interface Validator
 {
-        const MSG_PATHNOTFOUND  = 'msgPathNotFound';
-        const MSG_PATHISAFILE   = 'msgPathIsAFile';
-        const MSG_PATHISNOTADIR = 'msgPathIsNotADir';
+        /**
+         * Test a value to see if it is valid or not
+         *
+         * @return boolean
+         */
+        public function isValid($value);
 
-        protected $_messageTemplates = array
-        (
-                self::MSG_PATHNOTFOUND => "'%value%' does not exist on disk at all",
-                self::MSG_PATHISAFILE   => "'%value%' is a file; expected a directory",
-                self::MSG_PATHISNOTADIR => "'%value%' exists, but is not a directory",
-        );
-
-        public function isValid($value)
-        {
-                $this->_setValue($value);
-
-                $isValid = false;
-
-                if (is_dir($value))
-                {
-                        return true;
-                }
-                
-                if (!\file_exists($value))
-                {
-                        $this->_error(self::MSG_PATHNOTFOUND);
-                        return false;
-                }
-
-                // it exists, but what is it?
-                if (is_file($value))
-                {
-                        $this->_error(self::MSG_PATHISAFILE);
-                }
-                else
-                {
-                        // we do not know what it is
-                        $this->_error(self::MSG_PATHISNOTADIR);
-                }
-
-                return false;
-        }
+        /**
+         * Retrieve a list of the error messages if isValid() returned
+         * FALSE
+         *
+         * If isValid() returned TRUE, this will return an empty array
+         *
+         * @return array
+         */
+        public function getMessages();
 }
