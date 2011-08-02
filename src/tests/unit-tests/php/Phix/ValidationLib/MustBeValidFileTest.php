@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * Copyright (c) 2011 Stuart Herbert.
  * Copyright (c) 2010 Gradwell dot com Ltd.
  * All rights reserved.
  *
@@ -16,7 +17,7 @@
  *     the documentation and/or other materials provided with the
  *     distribution.
  *
- *   * Neither the name of Gradwell dot com Ltd nor the names of his
+ *   * Neither the names of the copyright holders nor the names of the
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -33,44 +34,51 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Gradwell
+ * @package     Phix
  * @subpackage  ValidationLib
- * @author      Stuart Herbert <stuart.herbert@gradwell.com>
+ * @author      Stuart Herbert <stuart@stuartherbert.com>
+ * @copyright   2011 Stuart Herbert. www.stuartherbert.com
  * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link        http://gradwell.github.com
+ * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Gradwell\ValidationLib;
+namespace Phix\ValidationLib;
 
-class MustBeInteger extends ValidatorAbstract
+class MustBeValidFileTest extends ValidationLibTestBase
 {
-        const MSG_NOTVALIDINTEGER = 'msgValidInteger';
-
-        protected $_messageTemplates = array
-        (
-                self::MSG_NOTVALIDINTEGER => "'%value%' (of type %type%) is not a valid integer",
-        );
-        
-        public function isValid($value)
+        /**
+         *
+         * @return MustBeValidFile
+         */
+        protected function setupObj()
         {
-                $this->_setValue($value);
+                // setup the test
+                $obj = new MustBeValidFile();
+                $messages = $obj->getMessages();
+                $this->assertTrue(is_array($messages));
+                $this->assertEquals(0, count($messages));
 
-                if (!is_int($value) && !is_string($value))
-                {
-                        $this->_error(self::MSG_NOTVALIDINTEGER);
-                        return false;
-                }
+                return $obj;
+        }
 
-                // does the (probably string) get through the filter too?
-                if ($value != \filter_var($value, \FILTER_SANITIZE_NUMBER_INT))
-                {
-                        $this->_error(self::MSG_NOTVALIDINTEGER);
-                        return false;
-                }
+        public function testCorrectlyDetectsAFile()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsValid($obj, __FILE__);
+        }
 
-                // if we get here, then we like the value
-                return true;
+        public function testCorrectlyDetectsAMissingFile()
+        {
+                $obj = $this->setupObj();
+                $file = __FILE__ . '.bogus';
+                $this->doTestIsNotValid($obj, $file, array("'$file' is not a valid file"));
+        }
+        
+        public function testCorrectlyDetectsADirectory()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsNotValid($obj, __DIR__, array("'" . __DIR__ . "' is not a valid file"));
         }
 }
