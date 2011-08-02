@@ -6,9 +6,10 @@
 //		A helping hand for running our unit tests
 //
 // Author	Stuart Herbert
-//		(stuart.herbert@gradwell.com)
+//		(stuart@stuartherbert.com)
 //
-// Copyright	(c) 2010 Gradwell dot com Ltd
+// Copyright	(c) 2011 Stuart Herbert
+// 		(c) 2010 Gradwell dot com Ltd
 //		All rights reserved
 //
 // =========================================================================
@@ -28,4 +29,4 @@ set_include_path(APP_TESTDIR . PATH_SEPARATOR . get_include_path());
 set_include_path(APP_TOPDIR . PATH_SEPARATOR . get_include_path());
 
 // step 5: find the autoloader, and install it
-require_once(APP_LIBDIR . '/gwc.autoloader.php');
+require_once(APP_LIBDIR . '/psr0.autoloader.php');
