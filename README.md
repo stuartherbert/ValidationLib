@@ -8,8 +8,8 @@ System-Wide Installation
 
 ValidationLib should be installed using the [PEAR Installer](http://pear.php.net). This installer is the community's de-facto standard for distributing PHP components.
 
-    sudo pear channel-discover pear.gradwell.com
-    sudo pear install --alldeps Gradwell/ValidationLib
+    sudo pear channel-discover pear.phix-project.org
+    sudo pear install --alldeps phix/ValidationLib
 
 After installation, you will find ValidationLib inside your local PEAR repository, which on Linux systems is normally /usr/share/php.
 
@@ -55,10 +55,10 @@ If you want to patch or enhance this component, you will need to create a suitab
     sudo pear install --alldeps phpunit/PHP_CodeBrowser
 
     # phix
-    sudo pear channel-discover pear.gradwell.com
-    sudo pear install --alldeps Gradwell/phix
+    sudo pear channel-discover pear.phix-project.org
+    sudo pear install --alldeps phix/phix
 
 You can then clone the git repository:
 
     # ValidationLib
-    git clone git://github.com/Gradwell/ValidationLib.git
+    git clone git://github.com/stuartherbert/ValidationLib.git

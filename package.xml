@@ -4,15 +4,15 @@
     http://pear.php.net/dtd/package-2.0
     http://pear.php.net/dtd/package-2.0.xsd">
   <name>ValidationLib</name>
-  <channel>pear.gradwell.com</channel>
+  <channel>pear.phix-project.org</channel>
   <summary>Lightweight library of reusable data validation tools</summary>
   <description>
     Inspired by Zend Framework, this is a lightweight library of reusable data validation tools.
   </description>
   <lead>
     <name>Stuart Herbert</name>
-    <user>stuartherbert</user>
-    <email>stuart.herbert@gradwell.com</email>
+    <user>stuart</user>
+    <email>stuart@stuartherbert.com</email>
     <active>yes</active>
   </lead>
   <date>${build.date}</date>
@@ -44,7 +44,7 @@ ${contents}
       </pearinstaller>
       <package>
         <name>Autoloader</name>
-        <channel>pear.gradwell.com</channel>
+        <channel>pear.phix-project.org</channel>
         <min>2.0.0</min>
 	      <max>2.999.9999</max>
       </package>
