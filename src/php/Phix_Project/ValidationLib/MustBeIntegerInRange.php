@@ -46,32 +46,42 @@
 
 namespace Phix_Project\ValidationLib;
 
-class MustBeInteger extends ValidatorAbstract
-{
-        const MSG_NOTVALIDINTEGER = 'msgValidInteger';
+class MustBeIntegerInRange extends ValidatorAbstract
+{        
+        const MSG_NOTVALIDINTEGER = "'%value%' (of type %type%) is not a valid integer";
+        const MSG_NOTINRANGE      = "'%value%' is not in the range %min% to %max%";
 
-        protected $_messageTemplates = array
-        (
-                self::MSG_NOTVALIDINTEGER => "'%value%' (of type %type%) is not a valid integer",
-        );
+        public function __construct($min, $max)
+        {
+                $this->minValue = $min;
+                $this->maxValue = $max;
+        }        
         
         public function isValid($value)
         {
-                $this->_setValue($value);
-
+                $this->setValue($value);
+                
                 if (!is_int($value) && !is_string($value))
                 {
-                        $this->_error(self::MSG_NOTVALIDINTEGER);
+                        $this->addMessage(self::MSG_NOTVALIDINTEGER);
                         return false;
                 }
 
                 // does the (probably string) get through the filter too?
-                if ($value != \filter_var($value, \FILTER_SANITIZE_NUMBER_INT))
+                if ($value != filter_var($value, FILTER_SANITIZE_NUMBER_INT))
                 {
-                        $this->_error(self::MSG_NOTVALIDINTEGER);
+                        $this->addMessage(self::MSG_NOTVALIDINTEGER);
                         return false;
                 }
 
+                // okay, so we have an integer
+                // is it in range?
+                if ($value < $this->minValue || $value > $this->maxValue)
+                {
+                        $this->addMessage(self::MSG_NOTINRANGE, array('%min%' => $this->minValue, '%max%' => $this->maxValue));
+                        return false;
+                }
+                
                 // if we get here, then we like the value
                 return true;
         }

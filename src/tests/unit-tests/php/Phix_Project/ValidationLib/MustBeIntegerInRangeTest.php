@@ -46,7 +46,7 @@
 
 namespace Phix_Project\ValidationLib;
 
-class MustBeIntegerTest extends ValidationLibTestBase
+class MustBeIntegerInRangeTest extends ValidationLibTestBase
 {
         /**
          *
@@ -55,7 +55,7 @@ class MustBeIntegerTest extends ValidationLibTestBase
         protected function setupObj()
         {
                 // setup the test
-                $obj = new MustBeInteger();
+                $obj = new MustBeIntegerInRange(-100, 100);
                 $messages = $obj->getMessages();
                 $this->assertTrue(is_array($messages));
                 $this->assertEquals(0, count($messages));
@@ -93,7 +93,7 @@ class MustBeIntegerTest extends ValidationLibTestBase
         public function testCorrectlyDetectsObjects()
         {
                 $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, $obj, array("'Phix_Project\ValidationLib\MustBeInteger' (of type object) is not a valid integer"));
+                $this->doTestIsNotValid($obj, $obj, array("'Phix_Project\ValidationLib\MustBeIntegerInRange' (of type object) is not a valid integer"));
         }
 
         public function testCorrectlyDetectsResources()
@@ -124,5 +124,17 @@ class MustBeIntegerTest extends ValidationLibTestBase
                 $arr = array (1,2,3,4,5,6,7,8,9,10);
 
                 $this->doTestIsNotValid($obj, $arr, array ("'' (of type array) is not a valid integer"));
+        }
+        
+        public function testCorrectlyDetectsIntegersThatAreTooSmall()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsNotValid($obj, -101, array("'-101' is not in the range -100 to 100"));
+        }
+        
+        public function testCorrectlyDetectsIntegersThatAreTooLarge()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsNotValid($obj, 101, array("'101' is not in the range -100 to 100"));
         }
 }
