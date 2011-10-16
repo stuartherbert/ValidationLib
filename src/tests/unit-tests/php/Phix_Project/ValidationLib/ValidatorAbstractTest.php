@@ -48,35 +48,28 @@ namespace Phix_Project\ValidationLib;
 
 class TestValidatorAbstract extends ValidatorAbstract
 {
-        const MSG_NOTVALIDSTRING = 'msgNotValidString';
-        const MSG_NOTVALIDMSG    = 'msgNotValidMsg';
-
-        protected $_messageTemplates = array
-        (
-                self::MSG_NOTVALIDSTRING => "'%value%' (of type %type%) is not a valid string",
-        );
+        const MSG_NOTVALIDSTRING = "'%value%' (of type %type%) is not a valid string";
+        const MSG_OUTOFRANGE = "'%value%' is not in the range %min%-%max%";
 
         public function isValid($value)
         {
-                $this->_setValue($value);
+                $this->setValue($value);
 
                 $isValid = true;
 
-                // special case, for testing purposes
-                if ($value == 'msgNotValidMsg')
-                {
-                        // this will cause an exception, deliberately!
-                        $this->_error(self::MSG_NOTVALIDMSG);
-                        return false;
-                }
-                
                 // these are the only types that convert to being a string
                 if (!is_int($value) && !is_float($value) && !is_string($value))
                 {
-                        $this->_error(self::MSG_NOTVALIDSTRING);
+                        $this->addMessage(self::MSG_NOTVALIDSTRING);
                         return false;
                 }
 
+                // special case for testing extra tokens
+                if (is_int($value) && ($value < 10 || $value > 20))
+                {
+                        $this->addMessage(self::MSG_OUTOFRANGE, array('%min%' => 10, '%max%' => 20));
+                        return false;
+                }
                 return true;
         }
 }
@@ -107,7 +100,7 @@ class ValidatorAbstractTest extends ValidationLibTestBase
                 $this->assertEquals(1, count($obj->getMessages()));
 
                 // now, let's validate something else
-                $this->assertTrue($obj->isValid(1));
+                $this->assertTrue($obj->isValid(11));
                 $this->assertTrue(is_array($obj->getMessages()));
                 $this->assertEquals(0, count($obj->getMessages()));
         }
@@ -139,22 +132,34 @@ class ValidatorAbstractTest extends ValidationLibTestBase
                 // the real test
                 $this->assertTrue($obj->hasMessages());
         }
-
-        public function testThrowsExceptionWhenMessageTemplateMissing()
+        
+        public function testCanExpandExtraTokensInTheErrorMessage()
         {
-                // create the object
+                // setup
                 $obj = $this->setupObj();
-
-                // force the error
-                $caughtException = false;
-                try
-                {
-                        $obj->isValid('msgNotValidMsg');
-                }
-                catch (\Exception $e)
-                {
-                        $caughtException = true;
-                }
-                $this->assertTrue($caughtException);
+                $expected = "'1' is not in the range 10-20";
+                
+                // change
+                $isValid = $obj->isValid(1);
+                                
+                // test
+                $this->assertFalse($isValid);                
+                $this->assertTrue($obj->hasMessages());
+                $messages = $obj->getMessages();
+                $this->assertEquals(1, count($messages));
+                $this->assertEquals($expected, $messages[0]);
+        }
+        
+        public function testCanObtainValueThatWasValidated()
+        {
+                // setup
+                $obj = $this->setupObj();
+                $this->assertNull($obj->getValue());
+                
+                // change
+                $obj->isValid(11);
+                
+                // test
+                $this->assertEquals(11, $obj->getValue());
         }
 }

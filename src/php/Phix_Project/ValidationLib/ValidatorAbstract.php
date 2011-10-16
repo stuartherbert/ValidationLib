@@ -56,13 +56,35 @@ abstract class ValidatorAbstract implements Validator
          * The value that the validator has been asked to check
          * @var mixed
          */
-        protected $value;
+        protected $value = null;
 
         /**
          * An array of the error messages generated during validation
          * @var array an array of error messages when validation fails
          */
         protected $errorMsgs = array();
+
+        /**
+         * Get the value that this validator has been asked to check
+         * @return mixed
+         */
+        public function getValue()
+        {
+                return $this->value;
+        }
+        
+        /**
+         * Set the value that this validator has been asked to check
+         * 
+         * Calling this method also empties the list of error messages
+         * 
+         * @param mixed $value 
+         */
+        protected function setValue($value)
+        {
+                $this->value = $value;
+                $this->errorMsgs = array();
+        }
 
         /**
          * Get the array of error messages
@@ -77,6 +99,11 @@ abstract class ValidatorAbstract implements Validator
                 return $this->errorMsgs;
         }
 
+        /**
+         * Do we have any error messages?
+         * 
+         * @return boolean
+         */
         public function hasMessages()
         {
                 if (count($this->errorMsgs) > 0)
@@ -87,19 +114,15 @@ abstract class ValidatorAbstract implements Validator
                 return false;
         }
         
-        protected function _setValue($value)
+        /**
+         * Add another error message to the pile
+         * 
+         * @param string $msg the format string to use
+         * @param array $extraTokens any additional tokens you want
+         *              expanded in the $msg
+         */
+        protected function addMessage($msg, $extraTokens = array())
         {
-                $this->value = $value;
-                $this->errorMsgs = array();
-        }
-
-        protected function _error($msg)
-        {
-                if (!isset($this->_messageTemplates[$msg]))
-                {
-                        throw new \Exception("Unknown error message '$msg'");
-                }
-                
                 // work out how to format the error message
                 $type = gettype($this->value);
 
@@ -132,16 +155,14 @@ abstract class ValidatorAbstract implements Validator
                                 break;
                 }
 
-                $searchList = array (
-                        '%value%',
-                        '%type%'
-                );
+                $searchList = array_keys($extraTokens);
+                $searchList[] = '%value%';
+                $searchList[] = '%type%';
 
-                $replaceList = array (
-                        $value,
-                        $type
-                );
+                $replaceList = array_values($extraTokens);
+                $replaceList[] = $value;
+                $replaceList[] = $type;
 
-                $this->errorMsgs[] = str_replace($searchList, $replaceList, $this->_messageTemplates[$msg]);
+                $this->errorMsgs[] = str_replace($searchList, $replaceList, $msg);
         }
 }

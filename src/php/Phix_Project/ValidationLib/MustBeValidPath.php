@@ -48,20 +48,13 @@ namespace Phix_Project\ValidationLib;
 
 class MustBeValidPath extends ValidatorAbstract
 {
-        const MSG_PATHNOTFOUND  = 'msgPathNotFound';
-        const MSG_PATHISAFILE   = 'msgPathIsAFile';
-        const MSG_PATHISNOTADIR = 'msgPathIsNotADir';
-
-        protected $_messageTemplates = array
-        (
-                self::MSG_PATHNOTFOUND => "'%value%' does not exist on disk at all",
-                self::MSG_PATHISAFILE   => "'%value%' is a file; expected a directory",
-                self::MSG_PATHISNOTADIR => "'%value%' exists, but is not a directory",
-        );
+        const MSG_PATHNOTFOUND  = "'%value%' does not exist on disk at all";
+        const MSG_PATHISAFILE   = "'%value%' is a file; expected a directory";
+        const MSG_PATHISNOTADIR = "'%value%' exists, but is not a directory";
 
         public function isValid($value)
         {
-                $this->_setValue($value);
+                $this->setValue($value);
 
                 $isValid = false;
 
@@ -70,21 +63,21 @@ class MustBeValidPath extends ValidatorAbstract
                         return true;
                 }
                 
-                if (!\file_exists($value))
+                if (!file_exists($value))
                 {
-                        $this->_error(self::MSG_PATHNOTFOUND);
+                        $this->addMessage(self::MSG_PATHNOTFOUND);
                         return false;
                 }
 
                 // it exists, but what is it?
                 if (is_file($value))
                 {
-                        $this->_error(self::MSG_PATHISAFILE);
+                        $this->addMessage(self::MSG_PATHISAFILE);
                 }
                 else
                 {
                         // we do not know what it is
-                        $this->_error(self::MSG_PATHISNOTADIR);
+                        $this->addMessage(self::MSG_PATHISNOTADIR);
                 }
 
                 return false;

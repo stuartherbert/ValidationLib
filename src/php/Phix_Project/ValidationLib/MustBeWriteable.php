@@ -48,29 +48,23 @@ namespace Phix_Project\ValidationLib;
 
 class MustBeWriteable extends ValidatorAbstract
 {
-        const MSG_ISNOTWRITEABLE = 'msgIsNotWriteable';
-        const MSG_DOESNOTEXIST   = 'msgDoesNotExist';
-
-        protected $_messageTemplates = array
-        (
-                self::MSG_DOESNOTEXIST  => "'%value%' does not exist; file or directory expected",
-                self::MSG_ISNOTWRITEABLE => "'%value%' exists, but is not writeable",
-        );
+        const MSG_ISNOTWRITEABLE = "'%value%' exists, but is not writeable";
+        const MSG_DOESNOTEXIST   = "'%value%' does not exist; file or directory expected";
 
         public function isValid($value)
         {
-                $this->_setValue($value);
+                $this->setValue($value);
 
                 $isValid = true;
 
-                if (!\file_exists($value))
+                if (!file_exists($value))
                 {
-                        $this->_error(self::MSG_DOESNOTEXIST);
+                        $this->addMessage(self::MSG_DOESNOTEXIST);
                         $isValid = false;
                 }
-                else if (!\is_writable($value))
+                else if (!is_writable($value))
                 {
-                        $this->_error(self::MSG_ISNOTWRITEABLE);
+                        $this->addMessage(self::MSG_ISNOTWRITEABLE);
                         $isValid = false;
                 }
 

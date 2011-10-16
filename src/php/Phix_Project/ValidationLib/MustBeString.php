@@ -48,23 +48,18 @@ namespace Phix_Project\ValidationLib;
 
 class MustBeString extends ValidatorAbstract
 {
-        const MSG_NOTVALIDSTRING = 'msgNotValidString';
+        const MSG_NOTVALIDSTRING = "'%value%' (of type %type%) is not a valid string";
 
-        protected $_messageTemplates = array
-        (
-                self::MSG_NOTVALIDSTRING => "'%value%' (of type %type%) is not a valid string",
-        );
-        
         public function isValid($value)
         {
-                $this->_setValue($value);
+                $this->setValue($value);
 
                 $isValid = true;
 
                 // these are the only types that convert to being a string
                 if (!is_int($value) && !is_float($value) && !is_string($value))
                 {
-                        $this->_error(self::MSG_NOTVALIDSTRING);
+                        $this->addMessage(self::MSG_NOTVALIDSTRING);
                         return false;
                 }
 
