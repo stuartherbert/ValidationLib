@@ -63,7 +63,7 @@
       <property file="${project.distdir.lastBuilt}"/>
     </then>
     <else>
-      <property name="project.lastBuiltTarfile" value="false"/>  
+      <property name="project.lastBuiltTarfile" value="false"/>
     </else>
   </if>
 
@@ -114,7 +114,7 @@
 
   <taskdef name="phingcallifexists" classname="Phix_Project.ComponentManager.Phing.PhingCallIfExistsTask" />
   <import file="build.local.xml"/>
-  
+
   <!-- Tell the user what this build file supports -->
   <target name="help">
     <echo message="${project.name} ${project.version}: build.xml targets:" />
@@ -139,6 +139,8 @@
     <echo message="      Run code quality tests for PHP_CodeBrowser" />
     <echo message="    phpcpd" />
     <echo message="      Check for cut and paste problems" />
+    <echo message="    phploc" />
+    <echo message="      Calculate the size of your PHP project" />
     <echo message="    phpdoc" />
     <echo message="      Create the PHP docs from source code" />
     <echo message="" />
@@ -205,7 +207,7 @@
     <delete dir="${project.review.codecoveragedir}" />
     <mkdir dir="${project.review.codecoveragedir}" />
     <mkdir dir="${project.review.logsdir}" />
-    <exec command="phpunit --configuration=phpunit.xml ${project.src.testunitdir}" checkreturn="true" logoutput="true"/>
+    <exec command="phpunit" checkreturn="true" logoutput="true"/>
     <echo/>
     <echo>The code coverage report is in file://${project.review.codecoveragedir}</echo>
     <echo/>
@@ -217,7 +219,7 @@
   </target>
 
   <!-- Run the code review quality tests -->
-  <target name="code-review" depends="run-unittests, code-browser, phpcpd, pdepend">
+  <target name="code-review" depends="run-unittests, code-browser, phpcpd, pdepend, phploc">
     <phingcallifexists target="local.code-review"/>
   </target>
 
@@ -263,6 +265,12 @@
     <exec command="phpcb --log ${project.review.logsdir} --source ${project.src.phpdir} --output ${project.review.codebrowserdir}" logoutput="true" />
   </target>
 
+  <!-- Work out the size of the project -->
+  <target name="phploc">
+    <mkdir dir="${project.review.logsdir}" />
+    <exec command="phploc --log-xml ${project.review.logsdir}/phploc.xml --log-csv ${project.review.logsdir}/phploc.csv ${project.src.phpdir}" logoutput="true" />
+  </target>
+
   <!-- Populate vendor with the dependencies for this component -->
   <target name="build-vendor" depends="pear-package,setup-vendor">
     <echo>Populating vendor/ with dependencies</echo>
@@ -298,13 +306,55 @@
     <echo>Building release directory</echo>
     <delete dir="${project.builddir}" />
     <mkdir dir="${project.pkgdir}" />
+    <if>
+      <available file="${project.src.bindir}"/>
+      <then>
+        <copy todir="${project.pkgdir}">
+          <fileset refid="binfiles"/>
+        </copy>
+      </then>
+    </if>
+    <if>
+      <available file="${project.src.datadir}"/>
+      <then>
+        <copy todir="${project.pkgdir}">
+          <fileset refid="datafiles"/>
+        </copy>
+      </then>
+    </if>
+    <if>
+      <available file="${project.src.docdir}"/>
+      <then>
+        <copy todir="${project.pkgdir}">
+          <fileset refid="docfiles"/>
+        </copy>
+      </then>
+    </if>
+    <if>
+      <available file="${project.src.phpdir}"/>
+      <then>
+        <copy todir="${project.pkgdir}">
+          <fileset refid="phpfiles"/>
+        </copy>
+      </then>
+    </if>
+    <if>
+      <available file="${project.src.testunitdir}"/>
+      <then>
+        <copy todir="${project.pkgdir}">
+          <fileset refid="testfiles"/>
+        </copy>
+      </then>
+    </if>
+    <if>
+      <available file="${project.src.wwwdir}"/>
+      <then>
+        <copy todir="${project.pkgdir}">
+          <fileset refid="wwwfiles"/>
+        </copy>
+      </then>
+    </if>
     <copy todir="${project.pkgdir}">
-      <fileset refid="binfiles"/>
-      <fileset refid="datafiles"/>
-      <fileset refid="phpfiles"/>
-      <fileset refid="testfiles"/>
-      <fileset refid="wwwfiles"/>
-      <fileset refid="docfiles"/>
       <fileset refid="topleveldocfiles"/>
     </copy>
     <copy todir="${project.builddir}">
@@ -325,8 +375,11 @@
       </fileset>
     </tar>
 
-    <!-- write a message to say which file we built last -->
+    <!-- remember the tarball we have just build -->
+    <property name="project.lastBuiltTarfile" value="${project.tarfile}" override="true"/>
     <echo file="${project.distdir.lastBuilt}" append="false">project.lastBuiltTarfile=${project.tarfile}</echo>
+
+    <!-- write a message to say which file we built last -->
     <echo>Your PEAR package is in ${project.tarfile}</echo>
     <phingcallifexists target="local.pear-package"/>
   </target>
@@ -338,18 +391,28 @@
         <contains string="${project.lastBuiltTarfile}" substring="${project.name}"/>
       </not>
       <then>
-        <echo>Please run 'phing pear-package' first, then try again.</echo>
+        <fail message="Please run 'phing pear-package' first, then try again."/>
       </then>
-      <elseif>
-        <available file="${project.lastBuiltTarfile}"/>
-        <then>
-          <exec command="pear -c ${project.tmpdir}/pear-config install --alldeps -f ${project.lastBuiltTarfile}" logoutput="true" checkreturn="true"/>
-          <phingcallifexists target="local.install-vendor"/>
-        </then>
-      </elseif>
+    </if>
+
+    <if>
+      <not>
+        <available file="${project.vendordir"/>
+      </not>
+      <then>
+        <phingcall target="build-vendor" />
+      </then>
+    </if>
+
+    <if>
+      <available file="${project.lastBuiltTarfile}"/>
+      <then>
+        <exec command="pear -c ${project.tmpdir}/pear-config install --alldeps -f ${project.lastBuiltTarfile}" logoutput="true" checkreturn="true"/>
+        <phingcallifexists target="local.install-vendor"/>
+      </then>
       <else>
         <echo>Cannot find PEAR package file ${project.lastBuiltTarfile}</echo>
-        <echo>Run 'phing pear-package' to create a new PEAR package, then try again</echo>
+        <fail message="Run 'phing pear-package' to create a new PEAR package, then try again."/>
       </else>
     </if>
   </target>
