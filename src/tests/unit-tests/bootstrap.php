@@ -25,3 +25,9 @@ require_once(APP_LIBDIR . '/psr0.autoloader.php');
 psr0_autoloader_searchFirst(APP_LIBDIR);
 psr0_autoloader_searchFirst(APP_TESTDIR);
 psr0_autoloader_searchFirst(APP_TOPDIR);
+
+// step 4: enable ContractLib if it is available
+if (class_exists('Phix_Project\ContractLib\Contract'))
+{
+        \Phix_Project\ContractLib\Contract::EnforceWrappedContracts();
+}
