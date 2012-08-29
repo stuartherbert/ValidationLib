@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
+ * Copyright (c) 2011-present Stuart Herbert.
  * Copyright (c) 2010 Gradwell dot com Ltd.
  * All rights reserved.
  *
@@ -17,7 +17,7 @@
  *     the documentation and/or other materials provided with the
  *     distribution.
  *
- *   * Neither the names of the copyright holders nor the names of the 
+ *   * Neither the names of the copyright holders nor the names of the
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -46,16 +46,16 @@
 
 namespace Phix_Project\ValidationLib;
 
-class MustBeIntegerTest extends ValidationLibTestBase
+class MustBePearFileRoleTest extends ValidationLibTestBase
 {
         /**
          *
-         * @return MustBeInteger 
+         * @return MustBePearFileRole
          */
         protected function setupObj()
         {
                 // setup the test
-                $obj = new MustBeInteger();
+                $obj = new MustBePearFileRole();
                 $messages = $obj->getMessages();
                 $this->assertTrue(is_array($messages));
                 $this->assertEquals(0, count($messages));
@@ -63,66 +63,83 @@ class MustBeIntegerTest extends ValidationLibTestBase
                 return $obj;
         }
 
-        public function testCorrectlyDetectsStrings()
+        public function testRoleMustBeAString()
         {
                 $obj = $this->setupObj();
-                $this->doTestIsValid($obj, '0');
-                $this->doTestIsNotValid($obj, 'fred', array("'fred' (of type string) is not a valid integer"));
+
+                // strings are valid
+                $this->doTestIsValid($obj, "bin");
+
+                // arrays are not valid
+                $this->doTestIsNotValid($obj, array(), array("'' is not a valid comma-separated set of PEAR file roles"));
+
+                // integers are not valid
+                $this->doTestIsNotValid($obj, 5, array("'5' is not a valid comma-separated set of PEAR file roles"));
+
+                // floats are not valid
+                $this->doTestIsNotValid($obj, 5.5, array("'5.5' is not a valid comma-separated set of PEAR file roles"));
+
+                // null is not valid
+                $this->doTestIsNotValid($obj, null, array("'' is not a valid comma-separated set of PEAR file roles"));
         }
 
-        public function testCorrectlyDetectsNulls()
+        public function testRoleCanBeBinary()
         {
-                $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, null, array("'' (of type NULL) is not a valid integer"));
+            $obj = $this->setupObj();
+
+            $this->doTestIsValid($obj, "bin");
+            $this->doTestIsValid($obj, "bin,data");
+            $this->doTestIsValid($obj, "data,bin");
+            $this->doTestIsValid($obj, "data,bin,php");
         }
 
-        public function testCorrectlyDetectsIntegers()
+        public function testRoleCanBeData()
         {
-                $obj = $this->setupObj();
-                $this->doTestIsValid($obj, 0);
-                $this->doTestIsValid($obj, 1);
-                $this->doTestIsValid($obj, -1);
+            $obj = $this->setupObj();
+
+            $this->doTestIsValid($obj, "data");
+            $this->doTestIsValid($obj, "data,bin");
+            $this->doTestIsValid($obj, "bin,data");
+            $this->doTestIsValid($obj, "bin,data,doc");
         }
 
-        public function testCorrectlyDetectsFloats()
+        public function testRoleCanBeDoc()
         {
-                $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, 3.145297, array("'3.145297' (of type double) is not a valid integer"));
+            $obj = $this->setupObj();
+
+            $this->doTestIsValid($obj, "doc");
+            $this->doTestIsValid($obj, "doc,bin");
+            $this->doTestIsValid($obj, "bin,doc");
+            $this->doTestIsValid($obj, "bin,doc,data");
         }
 
-        public function testCorrectlyDetectsObjects()
+        public function testRoleCanBePhp()
         {
-                $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, $obj, array("'Phix_Project\ValidationLib\MustBeInteger' (of type object) is not a valid integer"));
+            $obj = $this->setupObj();
+
+            $this->doTestIsValid($obj, "php");
+            $this->doTestIsValid($obj, "php,bin");
+            $this->doTestIsValid($obj, "bin,php");
+            $this->doTestIsValid($obj, "bin,php,data");
         }
 
-        public function testCorrectlyDetectsResources()
+        public function testRoleCanBeTest()
         {
-                $obj = $this->setupObj();
-                $res = fopen('php://input', 'r');
-                $this->doTestIsNotValid($obj, $res, array("'' (of type resource) is not a valid integer"));
+            $obj = $this->setupObj();
+
+            $this->doTestIsValid($obj, "test");
+            $this->doTestIsValid($obj, "test,bin");
+            $this->doTestIsValid($obj, "bin,test");
+            $this->doTestIsValid($obj, "bin,test,data");
         }
 
-        public function testCorrectlyDetectsBooleans()
+        public function testRoleCanBeWww()
         {
-                $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, true, array("'TRUE' (of type boolean) is not a valid integer"));
-                $this->doTestIsNotValid($obj, false, array("'FALSE' (of type boolean) is not a valid integer"));
-        }
+            $obj = $this->setupObj();
 
-        public function testCorrectlyDetectsClosures()
-        {
-                $obj = $this->setupObj();
-                $func = function() { return true; };
-
-                $this->doTestIsNotValid($obj, $func, array("'Closure' (of type object) is not a valid integer"));
-        }
-
-        public function testCorrectlyDetectsArrays()
-        {
-                $obj = $this->setupObj();
-                $arr = array (1,2,3,4,5,6,7,8,9,10);
-
-                $this->doTestIsNotValid($obj, $arr, array ("'' (of type array) is not a valid integer"));
+            $this->doTestIsValid($obj, "www");
+            $this->doTestIsValid($obj, "www,bin");
+            $this->doTestIsValid($obj, "bin,www");
+            $this->doTestIsValid($obj, "bin,www,data");
         }
 }
