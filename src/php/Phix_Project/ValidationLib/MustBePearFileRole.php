@@ -58,12 +58,19 @@ class MustBePearFileRole extends ValidatorAbstract
             'test'      => true,
             'www'       => true
         );
-        
+
         public function isValid($value)
         {
                 $this->setValue($value);
 
                 $isValid = true;
+
+                // $value must be a string
+                if (!is_string($value))
+                {
+                        $this->addMessage(self::MSG_NOTVALIDROLESET);
+                        return false;
+                }
 
                 // $value is allowed to be a comma-separated list
                 if (strpos($value, ',') !== false)
@@ -76,7 +83,7 @@ class MustBePearFileRole extends ValidatorAbstract
                                         $isValid = false;
                                 }
                         }
-                
+
                         if (!$isValid)
                         {
                                 $this->addMessage(self::MSG_NOTVALIDROLESET);
