@@ -47,7 +47,7 @@
 namespace Phix_Project\ValidationLib;
 
 class MustBeIntegerInRange extends ValidatorAbstract
-{        
+{
         const MSG_NOTVALIDINTEGER = "'%value%' (of type %type%) is not a valid integer";
         const MSG_NOTINRANGE      = "'%value%' is not in the range %min% to %max%";
 
@@ -55,12 +55,12 @@ class MustBeIntegerInRange extends ValidatorAbstract
         {
                 $this->minValue = $min;
                 $this->maxValue = $max;
-        }        
-        
+        }
+
         public function isValid($value)
         {
                 $this->setValue($value);
-                
+
                 if (!is_int($value) && !is_string($value))
                 {
                         $this->addMessage(self::MSG_NOTVALIDINTEGER);
@@ -81,7 +81,7 @@ class MustBeIntegerInRange extends ValidatorAbstract
                         $this->addMessage(self::MSG_NOTINRANGE, array('%min%' => $this->minValue, '%max%' => $this->maxValue));
                         return false;
                 }
-                
+
                 // if we get here, then we like the value
                 return true;
         }
