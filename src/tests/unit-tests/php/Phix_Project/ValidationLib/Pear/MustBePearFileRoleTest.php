@@ -37,7 +37,7 @@
  * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
+ * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
  * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
@@ -46,7 +46,7 @@
 
 namespace Phix_Project\ValidationLib;
 
-class MustBePearFileRoleTest extends ValidationLibTestBase
+class Pear_MustBePearFileRoleTest extends ValidationLibTestBase
 {
         /**
          *
@@ -55,10 +55,7 @@ class MustBePearFileRoleTest extends ValidationLibTestBase
         protected function setupObj()
         {
                 // setup the test
-                $obj = new MustBePearFileRole();
-                $messages = $obj->getMessages();
-                $this->assertTrue(is_array($messages));
-                $this->assertEquals(0, count($messages));
+                $obj = new Pear_MustBePearFileRole();
 
                 return $obj;
         }
@@ -69,6 +66,9 @@ class MustBePearFileRoleTest extends ValidationLibTestBase
 
                 // strings are valid
                 $this->doTestIsValid($obj, "bin");
+
+                // comma-separated strings are also valid
+                $this->doTestIsValid($obj, "bin,doc");
 
                 // arrays are not valid
                 $this->doTestIsNotValid($obj, array(), array("'' is not a valid comma-separated set of PEAR file roles"));
@@ -85,61 +85,69 @@ class MustBePearFileRoleTest extends ValidationLibTestBase
 
         public function testRoleCanBeBinary()
         {
-            $obj = $this->setupObj();
+                $obj = $this->setupObj();
 
-            $this->doTestIsValid($obj, "bin");
-            $this->doTestIsValid($obj, "bin,data");
-            $this->doTestIsValid($obj, "data,bin");
-            $this->doTestIsValid($obj, "data,bin,php");
+                $this->doTestIsValid($obj, "bin");
+                $this->doTestIsValid($obj, "bin,data");
+                $this->doTestIsValid($obj, "data,bin");
+                $this->doTestIsValid($obj, "data,bin,php");
         }
 
         public function testRoleCanBeData()
         {
-            $obj = $this->setupObj();
+                $obj = $this->setupObj();
 
-            $this->doTestIsValid($obj, "data");
-            $this->doTestIsValid($obj, "data,bin");
-            $this->doTestIsValid($obj, "bin,data");
-            $this->doTestIsValid($obj, "bin,data,doc");
+                $this->doTestIsValid($obj, "data");
+                $this->doTestIsValid($obj, "data,bin");
+                $this->doTestIsValid($obj, "bin,data");
+                $this->doTestIsValid($obj, "bin,data,doc");
         }
 
         public function testRoleCanBeDoc()
         {
-            $obj = $this->setupObj();
+                $obj = $this->setupObj();
 
-            $this->doTestIsValid($obj, "doc");
-            $this->doTestIsValid($obj, "doc,bin");
-            $this->doTestIsValid($obj, "bin,doc");
-            $this->doTestIsValid($obj, "bin,doc,data");
+                $this->doTestIsValid($obj, "doc");
+                $this->doTestIsValid($obj, "doc,bin");
+                $this->doTestIsValid($obj, "bin,doc");
+                $this->doTestIsValid($obj, "bin,doc,data");
         }
 
         public function testRoleCanBePhp()
         {
-            $obj = $this->setupObj();
+                $obj = $this->setupObj();
 
-            $this->doTestIsValid($obj, "php");
-            $this->doTestIsValid($obj, "php,bin");
-            $this->doTestIsValid($obj, "bin,php");
-            $this->doTestIsValid($obj, "bin,php,data");
+                $this->doTestIsValid($obj, "php");
+                $this->doTestIsValid($obj, "php,bin");
+                $this->doTestIsValid($obj, "bin,php");
+                $this->doTestIsValid($obj, "bin,php,data");
         }
 
         public function testRoleCanBeTest()
         {
-            $obj = $this->setupObj();
+                $obj = $this->setupObj();
 
-            $this->doTestIsValid($obj, "test");
-            $this->doTestIsValid($obj, "test,bin");
-            $this->doTestIsValid($obj, "bin,test");
-            $this->doTestIsValid($obj, "bin,test,data");
+                $this->doTestIsValid($obj, "test");
+                $this->doTestIsValid($obj, "test,bin");
+                $this->doTestIsValid($obj, "bin,test");
+                $this->doTestIsValid($obj, "bin,test,data");
         }
 
         public function testRoleCanBeWww()
         {
-            $obj = $this->setupObj();
+                $obj = $this->setupObj();
 
-            $this->doTestIsValid($obj, "www");
-            $this->doTestIsValid($obj, "www,bin");
-            $this->doTestIsValid($obj, "bin,www");
-            $this->doTestIsValid($obj, "bin,www,data");
+                $this->doTestIsValid($obj, "www");
+                $this->doTestIsValid($obj, "www,bin");
+                $this->doTestIsValid($obj, "bin,www");
+                $this->doTestIsValid($obj, "bin,www,data");
+        }
+
+        public function testRolesMustBeValid()
+        {
+                $obj = $this->setupObj();
+
+                $this->doTestIsNotValid($obj, "java", array("'java' is not a valid PEAR file role"));
+                $this->doTestIsNotValid($obj, "bin,java", array("'bin,java' is not a valid comma-separated set of PEAR file roles"));
         }
 }

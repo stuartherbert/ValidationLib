@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
- * Copyright (c) 2010 Gradwell dot com Ltd.
+ * Copyright (c) 2012-present Stuart Herbert.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,8 +36,7 @@
  * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
- * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
+ * @copyright   2012-present Stuart Herbert. www.stuartherbert.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
@@ -46,55 +44,42 @@
 
 namespace Phix_Project\ValidationLib;
 
-class MustBeValidPathTest extends ValidationLibTestBase
+class File_MustBePathWithValidParent implements Validator
 {
-        /**
-         *
-         * @return MustBeValidPath
-         */
-        protected function setupObj()
+        const MSG_PARENTNOTFOUND = "'%value%'s parent folder does not exist on disk at all";
+        const MSG_PATHISAFILE    = "'%value%' is a file; expected a directory";
+
+        public function validate($value, ValidationResult $result = null)
         {
-                // setup the test
-                $obj = new MustBeValidPath();
-                $messages = $obj->getMessages();
-                $this->assertTrue(is_array($messages));
-                $this->assertEquals(0, count($messages));
-
-                return $obj;
-        }
-
-        public function testCorrectlyDetectsADirectory()
-        {
-                $obj = $this->setupObj();
-                $this->doTestIsValid($obj, __DIR__);
-        }
-
-        public function testCorrectlyDetectsAFile()
-        {
-                $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, __FILE__, array("'" . __FILE__ . "' is a file; expected a directory"));
-        }
-
-        public function testCorrectlyDetectsAMissingDirectory()
-        {
-                $obj = $this->setupObj();
-                $dir = __DIR__ . '.bogus';
-                $this->doTestIsNotValid($obj, $dir, array("'$dir' does not exist on disk at all"));
-        }
-
-        public function testCorrectlyDetectsADevice()
-        {
-                $obj = $this->setupObj();
-
-                // this only works on unix-like operating systems
-                if (file_exists('/dev/null'))
+                if ($result === null)
                 {
-                        $this->doTestIsNotValid($obj, '/dev/null', array("'/dev/null' exists, but is not a directory"));
+                        $result = new ValidationResult($value);
                 }
-                else
+
+                // does this folder already exist?
+                //
+                // if it does, we don't need to do anything else at all
+                if (is_dir($value))
                 {
-                        // we fake this test for now
-                        $this->assertTrue(true);
+                        return $result;
                 }
+
+                // does it already exist as a file?
+                if (file_exists($value))
+                {
+                        $result->addError(static::MSG_PATHISAFILE);
+                        return $result;
+                }
+
+                // does its parent exist?
+                $parent = dirname($value);
+                if (!is_dir($parent))
+                {
+                        $result->addError(static::MSG_PARENTNOTFOUND);
+                        return $result;
+                }
+
+                // all done
+                return $result;
         }
 }

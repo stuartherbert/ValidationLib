@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
- * Copyright (c) 2010 Gradwell dot com Ltd.
+ * Copyright (c) 2011-present Stuart Herbert.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,8 +36,7 @@
  * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
- * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
+ * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
@@ -46,22 +44,58 @@
 
 namespace Phix_Project\ValidationLib;
 
-class MustBeValidFile extends ValidatorAbstract
+class Pear_MustBePearFileRole implements Validator
 {
-        const MSG_NOTVALIDFILE = "'%value%' is not a valid file";
+        const MSG_NOTVALIDROLE = "'%value%' is not a valid PEAR file role";
+        const MSG_NOTVALIDROLESET = "'%value%' is not a valid comma-separated set of PEAR file roles";
 
-        public function isValid($value)
+        protected $validRoles = array
+        (
+            'bin'       => true,
+            'data'      => true,
+            'doc'       => true,
+            'php'       => true,
+            'test'      => true,
+            'www'       => true
+        );
+
+        public function validate($value, ValidationResult $result = null)
         {
-                $this->setValue($value);
-
-                $isValid = true;
-
-                if (!is_file($value))
+                if ($result === null)
                 {
-                        $this->addMessage(self::MSG_NOTVALIDFILE);
-                        $isValid = false;
+                    $result = new ValidationResult($value);
                 }
 
-                return $isValid;
+                // $value must be a string
+                if (!is_string($value))
+                {
+                        $result->addError(static::MSG_NOTVALIDROLESET);
+                        return $result;
+                }
+
+                // $value is allowed to be a comma-separated list
+                if (strpos($value, ',') !== false)
+                {
+                        $roles = explode(',', $value);
+                        foreach ($roles as $role)
+                        {
+                                if (!isset($this->validRoles[$role]))
+                                {
+                                        $result->addError(static::MSG_NOTVALIDROLESET);
+                                        return $result;
+                                }
+                        }
+
+                        return $result;
+                }
+                else
+                {
+                        if (!isset($this->validRoles[$value]))
+                        {
+                                $result->addError(static::MSG_NOTVALIDROLE);
+                        }
+                }
+
+                return $result;
         }
 }

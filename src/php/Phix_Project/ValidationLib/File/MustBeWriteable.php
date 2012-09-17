@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
+ * Copyright (c) 2011-present Stuart Herbert.
  * Copyright (c) 2010 Gradwell dot com Ltd.
  * All rights reserved.
  *
@@ -37,7 +37,7 @@
  * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
+ * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
  * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
@@ -46,28 +46,27 @@
 
 namespace Phix_Project\ValidationLib;
 
-class MustBeWriteable extends ValidatorAbstract
+class File_MustBeWriteable extends ValidatorAbstract
 {
         const MSG_ISNOTWRITEABLE = "'%value%' exists, but is not writeable";
         const MSG_DOESNOTEXIST   = "'%value%' does not exist; file or directory expected";
 
-        public function isValid($value)
+        public function validate($value, ValidationResult $result = null)
         {
-                $this->setValue($value);
-
-                $isValid = true;
+                if ($result === null)
+                {
+                        $result = new ValidationResult($value);
+                }
 
                 if (!file_exists($value))
                 {
-                        $this->addMessage(self::MSG_DOESNOTEXIST);
-                        $isValid = false;
+                        $result->addError(static::MSG_DOESNOTEXIST);
                 }
                 else if (!is_writable($value))
                 {
-                        $this->addMessage(self::MSG_ISNOTWRITEABLE);
-                        $isValid = false;
+                        $result->addError(static::MSG_ISNOTWRITEABLE);
                 }
 
-                return $isValid;
+                return $result;
         }
 }

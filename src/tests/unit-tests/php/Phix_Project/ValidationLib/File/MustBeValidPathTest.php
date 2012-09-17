@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
+ * Copyright (c) 2011-present Stuart Herbert.
+ * Copyright (c) 2010 Gradwell dot com Ltd.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +37,8 @@
  * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
+ * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
+ * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
@@ -44,60 +46,52 @@
 
 namespace Phix_Project\ValidationLib;
 
-class MustBePearFileRole extends ValidatorAbstract
+class MustBeValidPathTest extends ValidationLibTestBase
 {
-        const MSG_NOTVALIDROLE = "'%value%' is not a valid PEAR file role";
-        const MSG_NOTVALIDROLESET = "'%value%' is not a valid comma-separated set of PEAR file roles";
-
-        protected $validRoles = array
-        (
-            'bin'       => true,
-            'data'      => true,
-            'doc'       => true,
-            'php'       => true,
-            'test'      => true,
-            'www'       => true
-        );
-
-        public function isValid($value)
+        /**
+         *
+         * @return MustBeValidPath
+         */
+        protected function setupObj()
         {
-                $this->setValue($value);
+                // setup the test
+                $obj = new File_MustBeValidPath();
 
-                $isValid = true;
+                return $obj;
+        }
 
-                // $value must be a string
-                if (!is_string($value))
+        public function testCorrectlyDetectsADirectory()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsValid($obj, __DIR__);
+        }
+
+        public function testCorrectlyDetectsAFile()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsNotValid($obj, __FILE__, array("'" . __FILE__ . "' is a file; expected a directory"));
+        }
+
+        public function testCorrectlyDetectsAMissingDirectory()
+        {
+                $obj = $this->setupObj();
+                $dir = __DIR__ . '.bogus';
+                $this->doTestIsNotValid($obj, $dir, array("'$dir' does not exist on disk at all"));
+        }
+
+        public function testCorrectlyDetectsADevice()
+        {
+                $obj = $this->setupObj();
+
+                // this only works on unix-like operating systems
+                if (file_exists('/dev/null'))
                 {
-                        $this->addMessage(self::MSG_NOTVALIDROLESET);
-                        return false;
-                }
-
-                // $value is allowed to be a comma-separated list
-                if (strpos($value, ',') !== false)
-                {
-                        $roles = explode(',', $value);
-                        foreach ($roles as $role)
-                        {
-                                if (!isset($this->validRoles[$role]))
-                                {
-                                        $isValid = false;
-                                }
-                        }
-
-                        if (!$isValid)
-                        {
-                                $this->addMessage(self::MSG_NOTVALIDROLESET);
-                        }
+                        $this->doTestIsNotValid($obj, '/dev/null', array("'/dev/null' exists, but is not a directory"));
                 }
                 else
                 {
-                        if (!isset($this->validRoles[$value]))
-                        {
-                                $this->addMessage(self::MSG_NOTVALIDROLE);
-                                $isValid = false;
-                        }
+                        // we fake this test for now
+                        $this->assertTrue(true);
                 }
-
-                return $isValid;
         }
 }

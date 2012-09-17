@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
+ * Copyright (c) 2011-present Stuart Herbert.
  * Copyright (c) 2010 Gradwell dot com Ltd.
  * All rights reserved.
  *
@@ -37,7 +37,7 @@
  * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
+ * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
  * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
@@ -46,27 +46,23 @@
 
 namespace Phix_Project\ValidationLib;
 
-class MustBeWriteableTest extends ValidationLibTestBase
+class File_MustBeWriteableTest extends ValidationLibTestBase
 {
         /**
          *
-         * @return MustBeWriteable
+         * @return File_MustBeWriteable
          */
         protected function setUp()
         {
                 // setup the test
-                $obj = new MustBeWriteable();
-                $messages = $obj->getMessages();
-                $this->assertTrue(is_array($messages));
-                $this->assertEquals(0, count($messages));
-
+                $obj = new File_MustBeWriteable();
                 $this->obj = $obj;
-                
+
                 // create the files and folders that we need
                 $this->rwfile = $this->tempname();
                 \file_put_contents($this->rwfile, 'test file');
                 \chmod($this->rwfile, 0777);
-                
+
                 $this->rofile = $this->tempname();
                 \file_put_contents($this->rofile, 'test file');
                 \chmod($this->rofile, 0444);
@@ -74,15 +70,15 @@ class MustBeWriteableTest extends ValidationLibTestBase
                 $this->nrfile = $this->tempname();
                 \file_put_contents($this->nrfile, 'test file');
                 \chmod($this->nrfile, 0);
-                
+
                 $this->rwdir = $this->tempname();
                 \unlink($this->rwdir);
                 \mkdir($this->rwdir, 0777);
-                
+
                 $this->rodir = $this->tempname();
                 \unlink($this->rodir);
                 \mkdir($this->rodir, 0444);
-                
+
                 $this->nrdir = $this->tempname();
                 \unlink($this->nrdir);
                 \mkdir($this->nrdir, 0);

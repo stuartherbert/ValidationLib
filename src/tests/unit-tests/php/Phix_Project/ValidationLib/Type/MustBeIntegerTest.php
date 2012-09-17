@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
+ * Copyright (c) 2011-present Stuart Herbert.
  * Copyright (c) 2010 Gradwell dot com Ltd.
  * All rights reserved.
  *
@@ -17,7 +17,7 @@
  *     the documentation and/or other materials provided with the
  *     distribution.
  *
- *   * Neither the names of the copyright holders nor the names of the 
+ *   * Neither the names of the copyright holders nor the names of the
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -37,7 +37,7 @@
  * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
+ * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
  * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
@@ -46,19 +46,16 @@
 
 namespace Phix_Project\ValidationLib;
 
-class MustBeStringTest extends ValidationLibTestBase
+class Type_MustBeIntegerTest extends ValidationLibTestBase
 {
         /**
          *
-         * @return MustBeString
+         * @return MustBeInteger
          */
         protected function setupObj()
         {
                 // setup the test
-                $obj = new MustBeString();
-                $messages = $obj->getMessages();
-                $this->assertTrue(is_array($messages));
-                $this->assertEquals(0, count($messages));
+                $obj = new Type_MustBeInteger();
 
                 return $obj;
         }
@@ -67,45 +64,47 @@ class MustBeStringTest extends ValidationLibTestBase
         {
                 $obj = $this->setupObj();
                 $this->doTestIsValid($obj, '0');
-                $this->doTestIsValid($obj, 'fred');
+                $this->doTestIsNotValid($obj, 'fred', array("'fred' (of type string) is not a valid integer"));
         }
 
         public function testCorrectlyDetectsNulls()
         {
                 $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, null, array("'' (of type NULL) is not a valid string"));
+                $this->doTestIsNotValid($obj, null, array("'' (of type NULL) is not a valid integer"));
         }
 
         public function testCorrectlyDetectsIntegers()
         {
                 $obj = $this->setupObj();
+                $this->doTestIsValid($obj, 0);
                 $this->doTestIsValid($obj, 1);
+                $this->doTestIsValid($obj, -1);
         }
 
         public function testCorrectlyDetectsFloats()
         {
                 $obj = $this->setupObj();
-                $this->doTestIsValid($obj, 3.145297);
+                $this->doTestIsNotValid($obj, 3.145297, array("'3.145297' (of type double) is not a valid integer"));
         }
 
         public function testCorrectlyDetectsObjects()
         {
                 $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, $obj, array("'Phix_Project\ValidationLib\MustBeString' (of type object) is not a valid string"));
+                $this->doTestIsNotValid($obj, $obj, array("'Phix_Project\ValidationLib\Type_MustBeInteger' (of type object) is not a valid integer"));
         }
 
         public function testCorrectlyDetectsResources()
         {
                 $obj = $this->setupObj();
                 $res = fopen('php://input', 'r');
-                $this->doTestIsNotValid($obj, $res, array("'' (of type resource) is not a valid string"));
+                $this->doTestIsNotValid($obj, $res, array("'' (of type resource) is not a valid integer"));
         }
 
         public function testCorrectlyDetectsBooleans()
         {
                 $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, true, array("'TRUE' (of type boolean) is not a valid string"));
-                $this->doTestIsNotValid($obj, false, array("'FALSE' (of type boolean) is not a valid string"));
+                $this->doTestIsNotValid($obj, true, array("'TRUE' (of type boolean) is not a valid integer"));
+                $this->doTestIsNotValid($obj, false, array("'FALSE' (of type boolean) is not a valid integer"));
         }
 
         public function testCorrectlyDetectsClosures()
@@ -113,7 +112,7 @@ class MustBeStringTest extends ValidationLibTestBase
                 $obj = $this->setupObj();
                 $func = function() { return true; };
 
-                $this->doTestIsNotValid($obj, $func, array("'Closure' (of type object) is not a valid string"));
+                $this->doTestIsNotValid($obj, $func, array("'Closure' (of type object) is not a valid integer"));
         }
 
         public function testCorrectlyDetectsArrays()
@@ -121,6 +120,6 @@ class MustBeStringTest extends ValidationLibTestBase
                 $obj = $this->setupObj();
                 $arr = array (1,2,3,4,5,6,7,8,9,10);
 
-                $this->doTestIsNotValid($obj, $arr, array ("'' (of type array) is not a valid string"));
+                $this->doTestIsNotValid($obj, $arr, array ("'' (of type array) is not a valid integer"));
         }
 }

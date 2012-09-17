@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
- * Copyright (c) 2010 Gradwell dot com Ltd.
+ * Copyright (c) 2012 Stuart Herbert.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -17,7 +16,7 @@
  *     the documentation and/or other materials provided with the
  *     distribution.
  *
- *   * Neither the names of the copyright holders nor the names of the 
+ *   * Neither the names of the copyright holders nor the names of the
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -37,8 +36,7 @@
  * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
- * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
+ * @copyright   2012 Stuart Herbert. www.stuartherbert.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
@@ -46,11 +44,7 @@
 
 namespace Phix_Project\ValidationLib;
 
-/**
- * This is inspired by Zend_Validate_Abstract, but has been put on a
- * much-needed diet :)
- */
-abstract class ValidatorAbstract implements Validator
+class ValidationResult
 {
         /**
          * The value that the validator has been asked to check
@@ -65,6 +59,16 @@ abstract class ValidatorAbstract implements Validator
         protected $errorMsgs = array();
 
         /**
+         * constructor. remembers the value that is under test
+         *
+         * @param mixed $value the value that is under test
+         */
+        public function __construct($value)
+        {
+                $this->setValue($value);
+        }
+
+        /**
          * Get the value that this validator has been asked to check
          * @return mixed
          */
@@ -72,18 +76,43 @@ abstract class ValidatorAbstract implements Validator
         {
                 return $this->value;
         }
-        
+
         /**
-         * Set the value that this validator has been asked to check
-         * 
-         * Calling this method also empties the list of error messages
-         * 
-         * @param mixed $value 
+         * Set the value that the validator has been asked to check
+         *
+         * @param mixed $value
          */
         protected function setValue($value)
         {
                 $this->value = $value;
-                $this->errorMsgs = array();
+        }
+
+        /**
+         * was the data valid?
+         *
+         * @return boolean true if there were no errors, false otherwise
+         */
+        public function isValid()
+        {
+                if (count($this->errorMsgs) == 0)
+                {
+                        return true;
+                }
+
+                return false;
+        }
+
+        /**
+         * throw an exception if the validation failed
+         *
+         * @return void
+         */
+        public function requireNoErrors()
+        {
+                if (!$this->isValid())
+                {
+                        throw new E4xx_ValidationFailedException($this);
+                }
         }
 
         /**
@@ -94,17 +123,17 @@ abstract class ValidatorAbstract implements Validator
          *
          * @return array
          */
-        public function getMessages()
+        public function getErrors()
         {
                 return $this->errorMsgs;
         }
 
         /**
          * Do we have any error messages?
-         * 
+         *
          * @return boolean
          */
-        public function hasMessages()
+        public function hasErrors()
         {
                 if (count($this->errorMsgs) > 0)
                 {
@@ -113,15 +142,15 @@ abstract class ValidatorAbstract implements Validator
 
                 return false;
         }
-        
+
         /**
          * Add another error message to the pile
-         * 
+         *
          * @param string $msg the format string to use
          * @param array $extraTokens any additional tokens you want
          *              expanded in the $msg
          */
-        protected function addMessage($msg, $extraTokens = array())
+        public function addError($msg, $extraTokens = array())
         {
                 // work out how to format the error message
                 $type = gettype($this->value);
@@ -129,7 +158,7 @@ abstract class ValidatorAbstract implements Validator
                 switch ($type)
                 {
                         case 'object':
-                                $value = get_class($this->value);
+                                $value = (string) $this->value;
                                 break;
 
                         case 'boolean':
@@ -151,7 +180,7 @@ abstract class ValidatorAbstract implements Validator
                                 break;
 
                         default:
-                                $value = '';
+                                $value = '[unsupported]';
                                 break;
                 }
 
@@ -164,5 +193,20 @@ abstract class ValidatorAbstract implements Validator
                 $replaceList[] = $type;
 
                 $this->errorMsgs[] = str_replace($searchList, $replaceList, $msg);
+        }
+
+        /**
+         * return the validation results as a string for ease of printing out
+         * @return string
+         */
+        public function __toString()
+        {
+                if ($this->isValid())
+                {
+                        return "Data is valid";
+                }
+
+                // if we get here, we have errors to return
+                return "Validation failed with error(s): " . implode(PHP_EOL, $this->errorMsgs);
         }
 }

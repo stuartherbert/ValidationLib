@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
- * Copyright (c) 2010 Gradwell dot com Ltd.
+ * Copyright (c) 2012 Stuart Herbert.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,8 +36,7 @@
  * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
- * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
+ * @copyright   2012 Stuart Herbert. www.stuartherbert.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
@@ -46,40 +44,18 @@
 
 namespace Phix_Project\ValidationLib;
 
-class MustBeValidPath extends ValidatorAbstract
+use Phix_Project\ExceptionsLib\E4xx_BadRequestException;
+
+class E4xx_ValidationFailedException extends E4xx_BadRequestException
 {
-        const MSG_PATHNOTFOUND  = "'%value%' does not exist on disk at all";
-        const MSG_PATHISAFILE   = "'%value%' is a file; expected a directory";
-        const MSG_PATHISNOTADIR = "'%value%' exists, but is not a directory";
+        public $validationResult;
 
-        public function isValid($value)
+        public function __construct(ValidationResult $result)
         {
-                $this->setValue($value);
+                // stash the failed validation result, in case it comes in handy
+                $this->validationResult = $result;
 
-                $isValid = false;
-
-                if (is_dir($value))
-                {
-                        return true;
-                }
-                
-                if (!file_exists($value))
-                {
-                        $this->addMessage(self::MSG_PATHNOTFOUND);
-                        return false;
-                }
-
-                // it exists, but what is it?
-                if (is_file($value))
-                {
-                        $this->addMessage(self::MSG_PATHISAFILE);
-                }
-                else
-                {
-                        // we do not know what it is
-                        $this->addMessage(self::MSG_PATHISNOTADIR);
-                }
-
-                return false;
+                // call the parent constructor
+                parent::__construct((string) $result);
         }
 }

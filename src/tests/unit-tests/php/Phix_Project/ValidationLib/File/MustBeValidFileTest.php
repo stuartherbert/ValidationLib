@@ -46,26 +46,36 @@
 
 namespace Phix_Project\ValidationLib;
 
-use PHPUnit_Framework_TestCase;
-
-class ValidationLibTestBase extends PHPUnit_Framework_TestCase
+class File_MustBeValidFileTest extends ValidationLibTestBase
 {
-        protected function doTestIsValid(Validator $validator, $value)
+        /**
+         *
+         * @return Test_MustBeValidFile
+         */
+        protected function setupObj()
         {
-                $result = $validator->validate($value);
-                $this->assertTrue($result instanceof ValidationResult);
+                // setup the test
+                $obj = new File_MustBeValidFile();
 
-                $this->assertTrue($result->isValid());
-                $this->assertEquals(0, count($result->getErrors()));
+                return $obj;
         }
 
-        protected function doTestIsNotValid(Validator $validator, $value, $errorMessages)
+        public function testCorrectlyDetectsAFile()
         {
-                $result = $validator->validate($value);
-                $this->assertTrue($result instanceof ValidationResult);
+                $obj = $this->setupObj();
+                $this->doTestIsValid($obj, __FILE__);
+        }
 
-                $this->assertFalse($result->isValid());
-                $this->assertNotEquals(0, count($result->getErrors()));
-                $this->assertEquals($errorMessages, $result->getErrors());
+        public function testCorrectlyDetectsAMissingFile()
+        {
+                $obj = $this->setupObj();
+                $file = __FILE__ . '.bogus';
+                $this->doTestIsNotValid($obj, $file, array("'$file' is not a valid file"));
+        }
+
+        public function testCorrectlyDetectsADirectory()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsNotValid($obj, __DIR__, array("'" . __DIR__ . "' is not a valid file"));
         }
 }

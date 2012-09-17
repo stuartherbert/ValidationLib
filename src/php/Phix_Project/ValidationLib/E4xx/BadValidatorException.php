@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
- * Copyright (c) 2010 Gradwell dot com Ltd.
+ * Copyright (c) 2012 Stuart Herbert.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,8 +36,7 @@
  * @package     Phix_Project
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
- * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
+ * @copyright   2012 Stuart Herbert. www.stuartherbert.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
@@ -46,39 +44,13 @@
 
 namespace Phix_Project\ValidationLib;
 
-class MustBeValidFileTest extends ValidationLibTestBase
+use Phix_Project\ExceptionsLib\E4xx_BadRequestException;
+
+class E4xx_BadValidatorException extends E4xx_BadRequestException
 {
-        /**
-         *
-         * @return MustBeValidFile
-         */
-        protected function setupObj()
+        public function __construct($validatorType)
         {
-                // setup the test
-                $obj = new MustBeValidFile();
-                $messages = $obj->getMessages();
-                $this->assertTrue(is_array($messages));
-                $this->assertEquals(0, count($messages));
-
-                return $obj;
-        }
-
-        public function testCorrectlyDetectsAFile()
-        {
-                $obj = $this->setupObj();
-                $this->doTestIsValid($obj, __FILE__);
-        }
-
-        public function testCorrectlyDetectsAMissingFile()
-        {
-                $obj = $this->setupObj();
-                $file = __FILE__ . '.bogus';
-                $this->doTestIsNotValid($obj, $file, array("'$file' is not a valid file"));
-        }
-        
-        public function testCorrectlyDetectsADirectory()
-        {
-                $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, __DIR__, array("'" . __DIR__ . "' is not a valid file"));
+                // call the parent constructor
+                parent::__construct("Bad validator: " . $validatorType . "; must be object that implements Validator");
         }
 }

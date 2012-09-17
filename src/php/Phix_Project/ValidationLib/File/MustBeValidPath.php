@@ -46,26 +46,41 @@
 
 namespace Phix_Project\ValidationLib;
 
-use PHPUnit_Framework_TestCase;
-
-class ValidationLibTestBase extends PHPUnit_Framework_TestCase
+class File_MustBeValidPath implements Validator
 {
-        protected function doTestIsValid(Validator $validator, $value)
+        const MSG_PATHNOTFOUND  = "'%value%' does not exist on disk at all";
+        const MSG_PATHISAFILE   = "'%value%' is a file; expected a directory";
+        const MSG_PATHISNOTADIR = "'%value%' exists, but is not a directory";
+
+        public function validate($value, ValidationResult $result = null)
         {
-                $result = $validator->validate($value);
-                $this->assertTrue($result instanceof ValidationResult);
+                if ($result === null)
+                {
+                        $result = new ValidationResult($value);
+                }
 
-                $this->assertTrue($result->isValid());
-                $this->assertEquals(0, count($result->getErrors()));
-        }
+                if (is_dir($value))
+                {
+                        return $result;
+                }
 
-        protected function doTestIsNotValid(Validator $validator, $value, $errorMessages)
-        {
-                $result = $validator->validate($value);
-                $this->assertTrue($result instanceof ValidationResult);
+                if (!file_exists($value))
+                {
+                        $result->addError(static::MSG_PATHNOTFOUND);
+                        return $result;
+                }
 
-                $this->assertFalse($result->isValid());
-                $this->assertNotEquals(0, count($result->getErrors()));
-                $this->assertEquals($errorMessages, $result->getErrors());
+                // it exists, but what is it?
+                if (is_file($value))
+                {
+                        $result->addError(static::MSG_PATHISAFILE);
+                }
+                else
+                {
+                        // we do not know what it is
+                        $result->addError(static::MSG_PATHISNOTADIR);
+                }
+
+                return $result;
         }
 }
