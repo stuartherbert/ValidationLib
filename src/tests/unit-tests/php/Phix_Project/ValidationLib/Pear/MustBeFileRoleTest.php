@@ -2,7 +2,6 @@
 
 /**
  * Copyright (c) 2011-present Stuart Herbert.
- * Copyright (c) 2010 Gradwell dot com Ltd.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +37,6 @@
  * @subpackage  ValidationLib
  * @author      Stuart Herbert <stuart@stuartherbert.com>
  * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
- * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
@@ -46,7 +44,7 @@
 
 namespace Phix_Project\ValidationLib;
 
-class Pear_MustBePearFileRoleTest extends ValidationLibTestBase
+class Pear_MustBeFileRoleTest extends ValidationLibTestBase
 {
         /**
          *
@@ -55,7 +53,7 @@ class Pear_MustBePearFileRoleTest extends ValidationLibTestBase
         protected function setupObj()
         {
                 // setup the test
-                $obj = new Pear_MustBePearFileRole();
+                $obj = new Pear_MustBeFileRole();
 
                 return $obj;
         }
@@ -71,7 +69,7 @@ class Pear_MustBePearFileRoleTest extends ValidationLibTestBase
                 $this->doTestIsValid($obj, "bin,doc");
 
                 // arrays are not valid
-                $this->doTestIsNotValid($obj, array(), array("'' is not a valid comma-separated set of PEAR file roles"));
+                $this->doTestIsNotValid($obj, array(), array("'(array)' is not a valid comma-separated set of PEAR file roles"));
 
                 // integers are not valid
                 $this->doTestIsNotValid($obj, 5, array("'5' is not a valid comma-separated set of PEAR file roles"));
@@ -80,7 +78,7 @@ class Pear_MustBePearFileRoleTest extends ValidationLibTestBase
                 $this->doTestIsNotValid($obj, 5.5, array("'5.5' is not a valid comma-separated set of PEAR file roles"));
 
                 // null is not valid
-                $this->doTestIsNotValid($obj, null, array("'' is not a valid comma-separated set of PEAR file roles"));
+                $this->doTestIsNotValid($obj, null, array("'NULL' is not a valid comma-separated set of PEAR file roles"));
         }
 
         public function testRoleCanBeBinary()

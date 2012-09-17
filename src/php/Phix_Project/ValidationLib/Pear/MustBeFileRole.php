@@ -44,7 +44,7 @@
 
 namespace Phix_Project\ValidationLib;
 
-class Pear_MustBePearFileRole implements Validator
+class Pear_MustBeFileRole implements Validator
 {
         const MSG_NOTVALIDROLE = "'%value%' is not a valid PEAR file role";
         const MSG_NOTVALIDROLESET = "'%value%' is not a valid comma-separated set of PEAR file roles";
