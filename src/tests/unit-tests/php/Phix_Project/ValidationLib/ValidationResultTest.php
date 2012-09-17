@@ -291,7 +291,8 @@ class ValidationResultTest extends PHPUnit_Framework_TestCase
         public function testErrorMessagesCanCopeWithResourceAsValue()
         {
                 // setup
-                $fp = fopen('./test.php', 'a');
+                $filename = './phix-test.php';
+                $fp = fopen($filename, 'a');
                 $obj = new ValidationResult($fp);
                 $msg = "'%value%' is an error";
                 $expectedMsgs = array("'[unsupported]' is an error");
@@ -299,7 +300,7 @@ class ValidationResultTest extends PHPUnit_Framework_TestCase
                 // test
                 $obj->addError($msg);
                 fclose($fp);
-                unlink($fp);
+                unlink($filename);
 
                 // results
                 $actualMsgs = $obj->getErrors();

@@ -70,7 +70,7 @@ class Type_MustBeStringTest extends ValidationLibTestBase
         public function testCorrectlyDetectsNulls()
         {
                 $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, null, array("'' (of type NULL) is not a valid string"));
+                $this->doTestIsNotValid($obj, null, array("'NULL' (of type NULL) is not a valid string"));
         }
 
         public function testCorrectlyDetectsIntegers()
@@ -88,14 +88,14 @@ class Type_MustBeStringTest extends ValidationLibTestBase
         public function testCorrectlyDetectsObjects()
         {
                 $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, $obj, array("'Phix_Project\ValidationLib\Type_MustBeString' (of type object) is not a valid string"));
+                $this->doTestIsNotValid($obj, $obj, array("'(object) Phix_Project\ValidationLib\Type_MustBeString' (of type object) is not a valid string"));
         }
 
         public function testCorrectlyDetectsResources()
         {
                 $obj = $this->setupObj();
                 $res = fopen('php://input', 'r');
-                $this->doTestIsNotValid($obj, $res, array("'' (of type resource) is not a valid string"));
+                $this->doTestIsNotValid($obj, $res, array("'[unsupported]' (of type resource) is not a valid string"));
         }
 
         public function testCorrectlyDetectsBooleans()
@@ -110,7 +110,7 @@ class Type_MustBeStringTest extends ValidationLibTestBase
                 $obj = $this->setupObj();
                 $func = function() { return true; };
 
-                $this->doTestIsNotValid($obj, $func, array("'Closure' (of type object) is not a valid string"));
+                $this->doTestIsNotValid($obj, $func, array("'(callable)' (of type object) is not a valid string"));
         }
 
         public function testCorrectlyDetectsArrays()
@@ -118,6 +118,6 @@ class Type_MustBeStringTest extends ValidationLibTestBase
                 $obj = $this->setupObj();
                 $arr = array (1,2,3,4,5,6,7,8,9,10);
 
-                $this->doTestIsNotValid($obj, $arr, array ("'' (of type array) is not a valid string"));
+                $this->doTestIsNotValid($obj, $arr, array ("'(array)' (of type array) is not a valid string"));
         }
 }

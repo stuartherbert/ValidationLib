@@ -44,6 +44,8 @@
 
 namespace Phix_Project\ValidationLib;
 
+use ReflectionObject;
+
 class ValidationResult
 {
         /**
@@ -155,33 +157,59 @@ class ValidationResult
                 // work out how to format the error message
                 $type = gettype($this->value);
 
-                switch ($type)
+                // special cases
+                if (is_callable($this->value))
                 {
-                        case 'object':
-                                $value = (string) $this->value;
-                                break;
+                        $value = '(callable)';
+                }
 
-                        case 'boolean':
-                                if ($this->value)
-                                {
-                                        $value = 'TRUE';
-                                }
-                                else
-                                {
-                                        $value = 'FALSE';
-                                }
-                                break;
+                if (!isset($value))
+                {
+                        switch ($type)
+                        {
+                                case 'object':
+                                        $refObj = new ReflectionObject($this->value);
+                                        if ($refObj->hasMethod('__toString'))
+                                        {
+                                                $value = (string) $this->value;
+                                        }
+                                        else
+                                        {
+                                                $value = '(object) ' .get_class($this->value);
+                                        }
+                                        break;
 
-                        case 'integer':
-                        case 'float':
-                        case 'double':
-                        case 'string':
-                                $value = $this->value;
-                                break;
+                                case 'boolean':
+                                        if ($this->value)
+                                        {
+                                                $value = 'TRUE';
+                                        }
+                                        else
+                                        {
+                                                $value = 'FALSE';
+                                        }
+                                        break;
 
-                        default:
-                                $value = '[unsupported]';
-                                break;
+                                case 'integer':
+                                case 'float':
+                                case 'double':
+                                case 'string':
+                                        $value = $this->value;
+                                        break;
+
+                                case 'NULL':
+                                        $value = 'NULL';
+                                        break;
+
+                                case 'array':
+                                        $value = '(array)';
+                                        break;
+
+                                default:
+                                        $value = '[unsupported]';
+                                        break;
+
+                        }
                 }
 
                 $searchList = array_keys($extraTokens);
