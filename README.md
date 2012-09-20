@@ -1,15 +1,15 @@
-ValidationLib
+ValidationLib4
 ==============
 
-**ValidationLib** is a lightweight collection of classes for validating data. It is inspired by Zend_Validation, but put on a much-needed diet :)
+**ValidationLib4** is a lightweight collection of classes for validating data. It is inspired by Zend_Validation, but put on a much-needed diet :)
 
 System-Wide Installation
 ------------------------
 
-ValidationLib should be installed using the [PEAR Installer](http://pear.php.net). This installer is the PHP community's de-facto standard for installing PHP components.
+ValidationLib4 should be installed using the [PEAR Installer](http://pear.php.net). This installer is the PHP community's de-facto standard for installing PHP components.
 
     sudo pear channel-discover pear.phix-project.org
-    sudo pear install --alldeps phix/ValidationLib
+    sudo pear install --alldeps phix/ValidationLib4
 
 As A Dependency On Your Component
 ---------------------------------
@@ -20,10 +20,10 @@ If you are creating a component that relies on ValidationLib, please make sure t
 <dependencies>
   <required>
     <package>
-      <name>ValidationLib</name>
+      <name>ValidationLib4</name>
       <channel>pear.phix-project.org</channel>
-      <min>2.0.0</min>
-      <max>2.999.9999</max>
+      <min>4.0.0</min>
+      <max>4.999.9999</max>
     </package>
   </required>
 </dependencies>
@@ -32,7 +32,7 @@ If you are creating a component that relies on ValidationLib, please make sure t
 Usage
 -----
 
-The best documentation for ValidationLib are the unit tests, which are shipped in the package.  You will find them installed into your PEAR repository, which on Linux systems is normally /usr/share/php/test.
+The best documentation for ValidationLib4 are the unit tests, which are shipped in the package.  You will find them installed into your PEAR repository, which on Linux systems is normally /usr/share/php/test.
 
 Development Environment
 -----------------------
@@ -47,7 +47,7 @@ If you want to patch or enhance this component, you will need to create a suitab
 
 You can then clone the git repository:
 
-    # ValidationLib
+    # ValidationLib4
     git clone git://github.com/stuartherbert/ValidationLib.git
 
 Then, install a local copy of this component's dependencies to complete the development environment:
