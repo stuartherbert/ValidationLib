@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
- * Copyright (c) 2010 Gradwell dot com Ltd.
+ * Copyright (c) 2012-present Stuart Herbert.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,29 +34,28 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Phix_Project
- * @subpackage  ValidationLib
+ * @subpackage  ValidationLib4
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
- * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
+ * @copyright   2012-present Stuart Herbert. www.stuartherbert.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix_Project\ValidationLib;
+namespace Phix_Project\ValidationLib4;
 
-class ValidationLibTestBase extends \PHPUnit_Framework_TestCase
+use Phix_Project\ExceptionsLib\E4xx_BadRequestException;
+
+class E4xx_ValidationFailedException extends E4xx_BadRequestException
 {
-        protected function doTestIsValid(Validator $validator, $value)
-        {
-                $this->assertTrue($validator->isValid($value));
-                $this->assertEquals(0, count($validator->getMessages()));
-        }
+        public $validationResult;
 
-        protected function doTestIsNotValid(Validator $validator, $value, $errorMessages)
+        public function __construct(ValidationResult $result)
         {
-                $this->assertFalse($validator->isValid($value));
-                $this->assertNotEquals(0, count($validator->getMessages()));
-                $this->assertEquals($errorMessages, $validator->getMessages());
+                // stash the failed validation result, in case it comes in handy
+                $this->validationResult = $result;
+
+                // call the parent constructor
+                parent::__construct((string) $result);
         }
 }

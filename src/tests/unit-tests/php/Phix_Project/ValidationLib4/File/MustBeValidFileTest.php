@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
+ * Copyright (c) 2011-present Stuart Herbert.
  * Copyright (c) 2010 Gradwell dot com Ltd.
  * All rights reserved.
  *
@@ -35,33 +35,47 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Phix_Project
- * @subpackage  ValidationLib
+ * @subpackage  ValidationLib4
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
+ * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
  * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix_Project\ValidationLib;
+namespace Phix_Project\ValidationLib4;
 
-class MustBeValidFile extends ValidatorAbstract
+class File_MustBeValidFileTest extends ValidationLibTestBase
 {
-        const MSG_NOTVALIDFILE = "'%value%' is not a valid file";
-
-        public function isValid($value)
+        /**
+         *
+         * @return Test_MustBeValidFile
+         */
+        protected function setupObj()
         {
-                $this->setValue($value);
+                // setup the test
+                $obj = new File_MustBeValidFile();
 
-                $isValid = true;
+                return $obj;
+        }
 
-                if (!is_file($value))
-                {
-                        $this->addMessage(self::MSG_NOTVALIDFILE);
-                        $isValid = false;
-                }
+        public function testCorrectlyDetectsAFile()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsValid($obj, __FILE__);
+        }
 
-                return $isValid;
+        public function testCorrectlyDetectsAMissingFile()
+        {
+                $obj = $this->setupObj();
+                $file = __FILE__ . '.bogus';
+                $this->doTestIsNotValid($obj, $file, array("'$file' is not a valid file"));
+        }
+
+        public function testCorrectlyDetectsADirectory()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsNotValid($obj, __DIR__, array("'" . __DIR__ . "' is not a valid file"));
         }
 }

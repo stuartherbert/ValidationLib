@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
+ * Copyright (c) 2011-present Stuart Herbert.
  * Copyright (c) 2010 Gradwell dot com Ltd.
  * All rights reserved.
  *
@@ -35,33 +35,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Phix_Project
- * @subpackage  ValidationLib
+ * @subpackage  ValidationLib4
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
+ * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
  * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix_Project\ValidationLib;
+namespace Phix_Project\ValidationLib4;
 
 interface Validator
 {
         /**
          * Test a value to see if it is valid or not
          *
-         * @return boolean
-         */
-        public function isValid($value);
-
-        /**
-         * Retrieve a list of the error messages if isValid() returned
-         * FALSE
+         * @param  mixed            $value  the data to be validated
+         * @param  ValidationResult $result an existing result to add any errors to
          *
-         * If isValid() returned TRUE, this will return an empty array
-         *
-         * @return array
+         * @return ValidationResult
          */
-        public function getMessages();
+        public function validate($value, ValidationResult $result = null);
 }

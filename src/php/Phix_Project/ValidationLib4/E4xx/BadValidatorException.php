@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
- * Copyright (c) 2010 Gradwell dot com Ltd.
+ * Copyright (c) 2012-present Stuart Herbert.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,39 +34,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Phix_Project
- * @subpackage  ValidationLib
+ * @subpackage  ValidationLib4
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
- * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
+ * @copyright   2012-present Stuart Herbert. www.stuartherbert.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix_Project\ValidationLib;
+namespace Phix_Project\ValidationLib4;
 
-class MustBeWriteable extends ValidatorAbstract
+use Phix_Project\ExceptionsLib\E4xx_BadRequestException;
+
+class E4xx_BadValidatorException extends E4xx_BadRequestException
 {
-        const MSG_ISNOTWRITEABLE = "'%value%' exists, but is not writeable";
-        const MSG_DOESNOTEXIST   = "'%value%' does not exist; file or directory expected";
-
-        public function isValid($value)
+        public function __construct($validatorType)
         {
-                $this->setValue($value);
-
-                $isValid = true;
-
-                if (!file_exists($value))
-                {
-                        $this->addMessage(self::MSG_DOESNOTEXIST);
-                        $isValid = false;
-                }
-                else if (!is_writable($value))
-                {
-                        $this->addMessage(self::MSG_ISNOTWRITEABLE);
-                        $isValid = false;
-                }
-
-                return $isValid;
+                // call the parent constructor
+                parent::__construct("Bad validator: " . $validatorType . "; must be object that implements Validator");
         }
 }

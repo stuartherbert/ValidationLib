@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
+ * Copyright (c) 2011-present Stuart Herbert.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,17 +34,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Phix_Project
- * @subpackage  ValidationLib
+ * @subpackage  ValidationLib4
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
+ * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix_Project\ValidationLib;
+namespace Phix_Project\ValidationLib4;
 
-class MustBePearFileRole extends ValidatorAbstract
+class Pear_MustBeFileRole implements Validator
 {
         const MSG_NOTVALIDROLE = "'%value%' is not a valid PEAR file role";
         const MSG_NOTVALIDROLESET = "'%value%' is not a valid comma-separated set of PEAR file roles";
@@ -58,12 +58,20 @@ class MustBePearFileRole extends ValidatorAbstract
             'test'      => true,
             'www'       => true
         );
-        
-        public function isValid($value)
-        {
-                $this->setValue($value);
 
-                $isValid = true;
+        public function validate($value, ValidationResult $result = null)
+        {
+                if ($result === null)
+                {
+                    $result = new ValidationResult($value);
+                }
+
+                // $value must be a string
+                if (!is_string($value))
+                {
+                        $result->addError(static::MSG_NOTVALIDROLESET);
+                        return $result;
+                }
 
                 // $value is allowed to be a comma-separated list
                 if (strpos($value, ',') !== false)
@@ -73,24 +81,21 @@ class MustBePearFileRole extends ValidatorAbstract
                         {
                                 if (!isset($this->validRoles[$role]))
                                 {
-                                        $isValid = false;
+                                        $result->addError(static::MSG_NOTVALIDROLESET);
+                                        return $result;
                                 }
                         }
-                
-                        if (!$isValid)
-                        {
-                                $this->addMessage(self::MSG_NOTVALIDROLESET);
-                        }
+
+                        return $result;
                 }
                 else
                 {
                         if (!isset($this->validRoles[$value]))
                         {
-                                $this->addMessage(self::MSG_NOTVALIDROLE);
-                                $isValid = false;
+                                $result->addError(static::MSG_NOTVALIDROLE);
                         }
                 }
 
-                return $isValid;
+                return $result;
         }
 }

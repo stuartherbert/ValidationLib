@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
+ * Copyright (c) 2011-present Stuart Herbert.
  * Copyright (c) 2010 Gradwell dot com Ltd.
  * All rights reserved.
  *
@@ -17,7 +17,7 @@
  *     the documentation and/or other materials provided with the
  *     distribution.
  *
- *   * Neither the names of the copyright holders nor the names of the 
+ *   * Neither the names of the copyright holders nor the names of the
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -35,30 +35,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Phix_Project
- * @subpackage  ValidationLib
+ * @subpackage  ValidationLib4
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
+ * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
  * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix_Project\ValidationLib;
+namespace Phix_Project\ValidationLib4;
 
-class MustBeIntegerTest extends ValidationLibTestBase
+class Type_MustBeIntegerInRangeTest extends ValidationLibTestBase
 {
         /**
          *
-         * @return MustBeInteger 
+         * @return MustBeInteger
          */
         protected function setupObj()
         {
                 // setup the test
-                $obj = new MustBeInteger();
-                $messages = $obj->getMessages();
-                $this->assertTrue(is_array($messages));
-                $this->assertEquals(0, count($messages));
+                $obj = new Type_MustBeIntegerInRange(-100, 100);
 
                 return $obj;
         }
@@ -73,7 +70,7 @@ class MustBeIntegerTest extends ValidationLibTestBase
         public function testCorrectlyDetectsNulls()
         {
                 $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, null, array("'' (of type NULL) is not a valid integer"));
+                $this->doTestIsNotValid($obj, null, array("'NULL' (of type NULL) is not a valid integer"));
         }
 
         public function testCorrectlyDetectsIntegers()
@@ -93,14 +90,14 @@ class MustBeIntegerTest extends ValidationLibTestBase
         public function testCorrectlyDetectsObjects()
         {
                 $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, $obj, array("'Phix_Project\ValidationLib\MustBeInteger' (of type object) is not a valid integer"));
+                $this->doTestIsNotValid($obj, $obj, array("'(object) Phix_Project\ValidationLib4\Type_MustBeIntegerInRange' (of type object) is not a valid integer"));
         }
 
         public function testCorrectlyDetectsResources()
         {
                 $obj = $this->setupObj();
                 $res = fopen('php://input', 'r');
-                $this->doTestIsNotValid($obj, $res, array("'' (of type resource) is not a valid integer"));
+                $this->doTestIsNotValid($obj, $res, array("'[unsupported]' (of type resource) is not a valid integer"));
         }
 
         public function testCorrectlyDetectsBooleans()
@@ -115,7 +112,7 @@ class MustBeIntegerTest extends ValidationLibTestBase
                 $obj = $this->setupObj();
                 $func = function() { return true; };
 
-                $this->doTestIsNotValid($obj, $func, array("'Closure' (of type object) is not a valid integer"));
+                $this->doTestIsNotValid($obj, $func, array("'(callable)' (of type object) is not a valid integer"));
         }
 
         public function testCorrectlyDetectsArrays()
@@ -123,6 +120,18 @@ class MustBeIntegerTest extends ValidationLibTestBase
                 $obj = $this->setupObj();
                 $arr = array (1,2,3,4,5,6,7,8,9,10);
 
-                $this->doTestIsNotValid($obj, $arr, array ("'' (of type array) is not a valid integer"));
+                $this->doTestIsNotValid($obj, $arr, array ("'(array)' (of type array) is not a valid integer"));
+        }
+
+        public function testCorrectlyDetectsIntegersThatAreTooSmall()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsNotValid($obj, -101, array("'-101' is not in the range -100 to 100"));
+        }
+
+        public function testCorrectlyDetectsIntegersThatAreTooLarge()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsNotValid($obj, 101, array("'101' is not in the range -100 to 100"));
         }
 }

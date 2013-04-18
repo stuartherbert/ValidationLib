@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
- * Copyright (c) 2010 Gradwell dot com Ltd.
+ * Copyright (c) 2012-present Stuart Herbert.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,39 +34,56 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Phix_Project
- * @subpackage  ValidationLib
+ * @subpackage  ValidationLib4
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
- * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
+ * @copyright   2012-present Stuart Herbert. www.stuartherbert.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix_Project\ValidationLib;
+namespace Phix_Project\ValidationLib4;
 
-class MustBeInteger extends ValidatorAbstract
+class File_MustBePathWithValidParentTest extends ValidationLibTestBase
 {
-        const MSG_NOTVALIDINTEGER = "'%value%' (of type %type%) is not a valid integer";
-
-        public function isValid($value)
+        /**
+         *
+         * @return MustBePathWithValidParent
+         */
+        protected function setupObj()
         {
-                $this->setValue($value);
+                // setup the test
+                $obj = new File_MustBePathWithValidParent();
 
-                if (!is_int($value) && !is_string($value))
-                {
-                        $this->addMessage(self::MSG_NOTVALIDINTEGER);
-                        return false;
-                }
+                // all done
+                return $obj;
+        }
 
-                // does the (probably string) get through the filter too?
-                if ($value != filter_var($value, FILTER_SANITIZE_NUMBER_INT))
-                {
-                        $this->addMessage(self::MSG_NOTVALIDINTEGER);
-                        return false;
-                }
+        public function testCorrectlyDetectsADirectory()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsValid($obj, __DIR__);
+        }
 
-                // if we get here, then we like the value
-                return true;
+        public function testCorrectlyDetectsAFile()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsNotValid($obj, __FILE__, array("'" . __FILE__ . "' is a file; expected a directory"));
+        }
+
+        public function testCorrectlyDetectsADevice()
+        {
+                $obj = $this->setupObj();
+                $this->doTestIsNotValid($obj, '/dev/null', array("'/dev/null' is a file; expected a directory"));
+        }
+
+        public function testCorrectlyDetectsAParent()
+        {
+                $obj = $this->setupObj();
+                $dir = __DIR__ . '.bogus';
+                $this->doTestIsValid($obj, $dir);
+
+                $dir = $dir . '/.bogus2';
+                $this->doTestIsNotValid($obj, $dir, array("'$dir's parent folder does not exist on disk at all"));
         }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
+ * Copyright (c) 2011-present Stuart Herbert.
  * Copyright (c) 2010 Gradwell dot com Ltd.
  * All rights reserved.
  *
@@ -35,51 +35,57 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Phix_Project
- * @subpackage  ValidationLib
+ * @subpackage  ValidationLib4
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
+ * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
  * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix_Project\ValidationLib;
+namespace Phix_Project\ValidationLib4;
 
-class MustBeValidPath extends ValidatorAbstract
+class Type_MustBeIntegerInRange implements Validator
 {
-        const MSG_PATHNOTFOUND  = "'%value%' does not exist on disk at all";
-        const MSG_PATHISAFILE   = "'%value%' is a file; expected a directory";
-        const MSG_PATHISNOTADIR = "'%value%' exists, but is not a directory";
+        const MSG_NOTVALIDINTEGER = "'%value%' (of type %type%) is not a valid integer";
+        const MSG_NOTINRANGE      = "'%value%' is not in the range %min% to %max%";
 
-        public function isValid($value)
+        public function __construct($min, $max)
         {
-                $this->setValue($value);
+                $this->minValue = $min;
+                $this->maxValue = $max;
+        }
 
-                $isValid = false;
-
-                if (is_dir($value))
+        public function validate($value, ValidationResult $result = null)
+        {
+                if ($result === null)
                 {
-                        return true;
-                }
-                
-                if (!file_exists($value))
-                {
-                        $this->addMessage(self::MSG_PATHNOTFOUND);
-                        return false;
+                        $result = new ValidationResult($value);
                 }
 
-                // it exists, but what is it?
-                if (is_file($value))
+                if (!is_int($value) && !is_string($value))
                 {
-                        $this->addMessage(self::MSG_PATHISAFILE);
-                }
-                else
-                {
-                        // we do not know what it is
-                        $this->addMessage(self::MSG_PATHISNOTADIR);
+                        $result->addError(static::MSG_NOTVALIDINTEGER);
+                        return $result;
                 }
 
-                return false;
+                // does the (probably string) get through the filter too?
+                if ($value != filter_var($value, FILTER_SANITIZE_NUMBER_INT))
+                {
+                        $result->addError(static::MSG_NOTVALIDINTEGER);
+                        return $result;
+                }
+
+                // okay, so we have an integer
+                // is it in range?
+                if ($value < $this->minValue || $value > $this->maxValue)
+                {
+                        $result->addError(static::MSG_NOTINRANGE, array('%min%' => $this->minValue, '%max%' => $this->maxValue));
+                        return $result;
+                }
+
+                // if we get here, then we like the value
+                return $result;
         }
 }

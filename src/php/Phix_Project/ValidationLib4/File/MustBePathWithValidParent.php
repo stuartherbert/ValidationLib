@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
- * Copyright (c) 2010 Gradwell dot com Ltd.
+ * Copyright (c) 2012-present Stuart Herbert.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,54 +34,52 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Phix_Project
- * @subpackage  ValidationLib
+ * @subpackage  ValidationLib4
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
- * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
+ * @copyright   2012-present Stuart Herbert. www.stuartherbert.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix_Project\ValidationLib;
+namespace Phix_Project\ValidationLib4;
 
-class MustBeIntegerInRange extends ValidatorAbstract
-{        
-        const MSG_NOTVALIDINTEGER = "'%value%' (of type %type%) is not a valid integer";
-        const MSG_NOTINRANGE      = "'%value%' is not in the range %min% to %max%";
+class File_MustBePathWithValidParent implements Validator
+{
+        const MSG_PARENTNOTFOUND = "'%value%'s parent folder does not exist on disk at all";
+        const MSG_PATHISAFILE    = "'%value%' is a file; expected a directory";
 
-        public function __construct($min, $max)
+        public function validate($value, ValidationResult $result = null)
         {
-                $this->minValue = $min;
-                $this->maxValue = $max;
-        }        
-        
-        public function isValid($value)
-        {
-                $this->setValue($value);
-                
-                if (!is_int($value) && !is_string($value))
+                if ($result === null)
                 {
-                        $this->addMessage(self::MSG_NOTVALIDINTEGER);
-                        return false;
+                        $result = new ValidationResult($value);
                 }
 
-                // does the (probably string) get through the filter too?
-                if ($value != filter_var($value, FILTER_SANITIZE_NUMBER_INT))
+                // does this folder already exist?
+                //
+                // if it does, we don't need to do anything else at all
+                if (is_dir($value))
                 {
-                        $this->addMessage(self::MSG_NOTVALIDINTEGER);
-                        return false;
+                        return $result;
                 }
 
-                // okay, so we have an integer
-                // is it in range?
-                if ($value < $this->minValue || $value > $this->maxValue)
+                // does it already exist as a file?
+                if (file_exists($value))
                 {
-                        $this->addMessage(self::MSG_NOTINRANGE, array('%min%' => $this->minValue, '%max%' => $this->maxValue));
-                        return false;
+                        $result->addError(static::MSG_PATHISAFILE);
+                        return $result;
                 }
-                
-                // if we get here, then we like the value
-                return true;
+
+                // does its parent exist?
+                $parent = dirname($value);
+                if (!is_dir($parent))
+                {
+                        $result->addError(static::MSG_PARENTNOTFOUND);
+                        return $result;
+                }
+
+                // all done
+                return $result;
         }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
+ * Copyright (c) 2011-present Stuart Herbert.
  * Copyright (c) 2010 Gradwell dot com Ltd.
  * All rights reserved.
  *
@@ -35,66 +35,35 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Phix_Project
- * @subpackage  ValidationLib
+ * @subpackage  ValidationLib4
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
+ * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
  * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix_Project\ValidationLib;
+namespace Phix_Project\ValidationLib4;
 
-class MustBeValidPathTest extends ValidationLibTestBase
+class Type_MustBeString implements Validator
 {
-        /**
-         *
-         * @return MustBeValidPath
-         */
-        protected function setupObj()
+        const MSG_NOTVALIDSTRING = "'%value%' (of type %type%) is not a valid string";
+
+        public function validate($value, ValidationResult $result = null)
         {
-                // setup the test
-                $obj = new MustBeValidPath();
-                $messages = $obj->getMessages();
-                $this->assertTrue(is_array($messages));
-                $this->assertEquals(0, count($messages));
-
-                return $obj;
-        }
-
-        public function testCorrectlyDetectsADirectory()
-        {
-                $obj = $this->setupObj();
-                $this->doTestIsValid($obj, __DIR__);
-        }
-
-        public function testCorrectlyDetectsAFile()
-        {
-                $obj = $this->setupObj();
-                $this->doTestIsNotValid($obj, __FILE__, array("'" . __FILE__ . "' is a file; expected a directory"));
-        }
-
-        public function testCorrectlyDetectsAMissingDirectory()
-        {
-                $obj = $this->setupObj();
-                $dir = __DIR__ . '.bogus';
-                $this->doTestIsNotValid($obj, $dir, array("'$dir' does not exist on disk at all"));
-        }
-
-        public function testCorrectlyDetectsADevice()
-        {
-                $obj = $this->setupObj();
-
-                // this only works on unix-like operating systems
-                if (file_exists('/dev/null'))
+                if ($result === null)
                 {
-                        $this->doTestIsNotValid($obj, '/dev/null', array("'/dev/null' exists, but is not a directory"));
+                        $result = new ValidationResult($value);
                 }
-                else
+
+                // these are the only types that convert to being a string
+                if (!is_int($value) && !is_float($value) && !is_string($value))
                 {
-                        // we fake this test for now
-                        $this->assertTrue(true);
+                        $result->addError(static::MSG_NOTVALIDSTRING);
+                        return $result;
                 }
+
+                return $result;
         }
 }

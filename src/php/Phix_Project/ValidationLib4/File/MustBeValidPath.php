@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Stuart Herbert.
+ * Copyright (c) 2011-present Stuart Herbert.
  * Copyright (c) 2010 Gradwell dot com Ltd.
  * All rights reserved.
  *
@@ -35,34 +35,52 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Phix_Project
- * @subpackage  ValidationLib
+ * @subpackage  ValidationLib4
  * @author      Stuart Herbert <stuart@stuartherbert.com>
- * @copyright   2011 Stuart Herbert. www.stuartherbert.com
+ * @copyright   2011-present Stuart Herbert. www.stuartherbert.com
  * @copyright   2010 Gradwell dot com Ltd. www.gradwell.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://www.phix-project.org
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Phix_Project\ValidationLib;
+namespace Phix_Project\ValidationLib4;
 
-class MustBeString extends ValidatorAbstract
+class File_MustBeValidPath implements Validator
 {
-        const MSG_NOTVALIDSTRING = "'%value%' (of type %type%) is not a valid string";
+        const MSG_PATHNOTFOUND  = "'%value%' does not exist on disk at all";
+        const MSG_PATHISAFILE   = "'%value%' is a file; expected a directory";
+        const MSG_PATHISNOTADIR = "'%value%' exists, but is not a directory";
 
-        public function isValid($value)
+        public function validate($value, ValidationResult $result = null)
         {
-                $this->setValue($value);
-
-                $isValid = true;
-
-                // these are the only types that convert to being a string
-                if (!is_int($value) && !is_float($value) && !is_string($value))
+                if ($result === null)
                 {
-                        $this->addMessage(self::MSG_NOTVALIDSTRING);
-                        return false;
+                        $result = new ValidationResult($value);
                 }
 
-                return true;
+                if (is_dir($value))
+                {
+                        return $result;
+                }
+
+                if (!file_exists($value))
+                {
+                        $result->addError(static::MSG_PATHNOTFOUND);
+                        return $result;
+                }
+
+                // it exists, but what is it?
+                if (is_file($value))
+                {
+                        $result->addError(static::MSG_PATHISAFILE);
+                }
+                else
+                {
+                        // we do not know what it is
+                        $result->addError(static::MSG_PATHISNOTADIR);
+                }
+
+                return $result;
         }
 }
