@@ -44,7 +44,7 @@
 
 namespace Phix_Project\ValidationLib4;
 
-use Phix_Project\ExceptionsLib\E4xx_BadRequestException;
+use Phix_Project\ExceptionsLib1\E4xx_BadRequestException;
 
 class E4xx_BadValidatorException extends E4xx_BadRequestException
 {
