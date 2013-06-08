@@ -1,6 +1,8 @@
 .build
+composer.lock
+composer.phar
 dist
-.tmp
 nbproject
 review
+.tmp
 vendor
