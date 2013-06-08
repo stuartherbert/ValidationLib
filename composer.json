@@ -1,6 +1,6 @@
 {
-	"name": "phix/validationlib4",
-	"description": "validationlib4 is a lightweight library of reusable data validation tools",
+	"name": "phix/validationlib",
+	"description": "ValidationLib is a lightweight library of reusable data validation tools",
 	"keywords": [
 		"exceptions",
 		"error handling"
