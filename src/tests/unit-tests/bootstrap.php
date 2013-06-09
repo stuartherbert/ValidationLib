@@ -47,9 +47,9 @@ else {
 	define('PHIX_USING_COMPOSER', false);
 }
 
-if (file_exists(PHIX_COMPOSER_VENDOR_DIR . '/phix/autoloader4/src/php/Phix_Project/Autoloader4/PSR0/Autoloader.php')) {
+if (file_exists(PHIX_COMPOSER_VENDOR_DIR . '/phix/autoloader/src/php/Phix_Project/Autoloader4/PSR0/Autoloader.php')) {
 	// we are using Phix's autoloader in the (Composer) vendor/ folder
-	require_once(PHIX_COMPOSER_VENDOR_DIR . '/phix/autoloader4/src/php/Phix_Project/Autoloader4/PSR0/Autoloader.php');
+	require_once(PHIX_COMPOSER_VENDOR_DIR . '/phix/autoloader/src/php/Phix_Project/Autoloader4/PSR0/Autoloader.php');
 }
 else if (file_exists(PHIX_PEAR_VENDOR_DIR . '/Phix_Project/Autoloader4/PSR0/Autoloader.php')) {
 	// we are using Phix's autoloader in the (PEAR) vendor/ folder
