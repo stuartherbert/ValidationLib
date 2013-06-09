@@ -1,5 +1,5 @@
 {
-	"name": "phix/validationlib4",
+	"name": "phix/validationlib",
 	"description": "ValidationLib is a lightweight library of reusable data validation tools",
 	"keywords": [
 		"exceptions",
@@ -23,9 +23,9 @@
 		"psr-0": { "" : "src/php/" }
 	},
 	"require": {
-		"phix/exceptionslib1": "1.*"
+		"phix/exceptionslib": "1.*"
 	},
 	"require-dev": {
-		"phix/autoloader4": "4.*"
+		"phix/autoloader": "4.*"
 	}
 }
